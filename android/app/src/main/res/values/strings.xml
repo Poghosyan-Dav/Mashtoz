@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Mashtoz</string>
+    <string name="facebook_app_id">1120564798494663</string>
+    <string name="fb_login_protocol_scheme">fb1120564798494663</string>
+    <string name="facebook_client_token">3f9d47c21cfa314fd74d1843a3bc3101</string>
+
+</resources>

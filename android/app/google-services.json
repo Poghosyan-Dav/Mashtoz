@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "853680183845",
+    "project_id": "mashtoz-kayq",
+    "storage_bucket": "mashtoz-kayq.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:853680183845:android:7634d4fa0725ce15737dcc",
+        "android_client_info": {
+          "package_name": "com.mashtoc.mashtoc"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "853680183845-f581bjebl3lue76rn37e170o9n7q475k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyACIkXhqaIiSl6Z83WCL25Ydx4OA_lWxjo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "853680183845-f581bjebl3lue76rn37e170o9n7q475k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
