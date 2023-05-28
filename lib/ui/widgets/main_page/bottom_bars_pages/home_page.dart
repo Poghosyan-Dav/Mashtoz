@@ -34,6 +34,7 @@ import 'package:platform_device_id/platform_device_id.dart';
 import 'package:responsive_grid_list/responsive_grid_list.dart';
 
 import '../../../../domens/models/book_data/content_list.dart';
+import '../../../../tab_navigator.dart';
 import '../../helper_widgets/size_config.dart';
 import '../../youtube_videos/advanced_overlay.dart';
 import '../main_menu_pages/audio_library/audio_library.dart';
@@ -794,11 +795,14 @@ class HomePageState extends State<HomePage> {
                                                           alignment: Alignment.bottomRight,
                                                           child: GestureDetector(
                                                             onTap: () {
-                                                              Navigator.of(context,rootNavigator: true).push(
-                                                                  MaterialPageRoute(
-                                                                      builder: ((_) =>
-
-                                                                          const LibraryPage(isFromHomePage: true,))));
+                                                              Navigator.of(context, rootNavigator: true).push(
+                                                                MaterialPageRoute(
+                                                                  builder: (_) => TabNavigator(
+                                                                    navigatorKey: GlobalKey<NavigatorState>(),
+                                                                    tabItem: 'librarypage',
+                                                                  ),
+                                                                ),
+                                                              );
                                                             },
                                                             child: const Text(
                                                               'Տեսնել բոլորը',

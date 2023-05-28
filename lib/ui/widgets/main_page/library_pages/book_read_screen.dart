@@ -1374,6 +1374,15 @@ class _BookPagesState extends State<BookPages> {
                                                 endIndent:20,
                                                 thickness: 2,color: Palette.main),
                                             SizedBox(height: 20),
+                                        // Container(
+                                        //   padding: EdgeInsets.only(
+                                        //       left: 16.0, right: 16.0),
+                                        //   width: MediaQuery.of(context).size.width,
+                                        //   child: HtmlWidget(
+                                        //       readScreen != null && readScreen?.explanation != null  ?
+                                        //            '''${readScreen?.explanation}''': searchBodyData != null && searchBodyData?.explanation != null ?
+                                        //            '''${searchBodyData?.explanation}''' : encyclopediaBody != null &&  encyclopediaBody?.explanation != null ? '''${encyclopediaBody?.explanation}''' :  '''''',
+                                        //   ),),
                                             Padding(
                                               padding: const EdgeInsets.only(left: 20,right: 20),
                                               child: Html(

@@ -7,14 +7,14 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:853680183845:android:7634d4fa0725ce15737dcc",
+        "mobilesdk_app_id": "1:853680183845:android:48472cf3586cc51a737dcc",
         "android_client_info": {
-          "package_name": "com.mashtoc.mashtoc"
+          "package_name": "com.end.mashtoz"
         }
       },
       "oauth_client": [
         {
-          "client_id": "853680183845-f581bjebl3lue76rn37e170o9n7q475k.apps.googleusercontent.com",
+          "client_id": "853680183845-od7f51fubu3g985am9ctjfja8mnu72fh.apps.googleusercontent.com",
           "client_type": 3
         }
       ],

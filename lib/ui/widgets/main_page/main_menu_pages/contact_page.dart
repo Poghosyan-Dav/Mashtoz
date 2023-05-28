@@ -189,7 +189,7 @@ class _ContactState extends State<Contact> {
       validator: (value) {
         if (value!.isEmpty ||
             !value.contains(RegExp(
-                r"^(?:[ա-ֆԱ-Ֆա-ֆԱ-Ֆ\w+а-яА-Яа-яА-Яa-zA-Z]{3,} [ա-ֆԱ-Ֆա-ֆԱ-Ֆ\w+а-яА-Яа-яА-Яa-zA-Za-zA-Z]{5,}){0,1}$"))) {
+                r"^(?:[ա-ֆԱ-Ֆա-ֆԱ-Ֆ\w+а-яА-Яа-яА-Яa-zA-Z]{2,} [ա-ֆԱ-Ֆա-ֆԱ-Ֆ\w+а-яА-Яа-яА-Яa-zA-Za-zA-Z]{2,}){0,1}$"))) {
           return 'Մուտքագրված տվյալները սխալ են ';
         }
         return null;
