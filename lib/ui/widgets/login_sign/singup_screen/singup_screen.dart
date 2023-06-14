@@ -27,7 +27,7 @@ class SignupScreen extends StatelessWidget {
           child: GestureDetector(
             onTap: () => FocusScope.of(context).unfocus(),
             child: SingleChildScrollView(
-              physics:const NeverScrollableScrollPhysics(),
+              physics:const AlwaysScrollableScrollPhysics(),
               child: Container(
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height,

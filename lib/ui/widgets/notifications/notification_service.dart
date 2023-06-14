@@ -3,10 +3,10 @@ import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:mashtoz_flutter/ui/widgets/main_page/home_screen.dart';
 import 'package:mashtoz_flutter/ui/widgets/main_page/library_pages/book_page.dart';
 import 'package:mashtoz_flutter/ui/widgets/main_page/library_pages/book_read_screen.dart';
 import 'package:mashtoz_flutter/ui/widgets/main_page/main_menu_pages/audio_library/audio_librar_data_show.dart';
-import 'package:mashtoz_flutter/ui/widgets/main_page/main_menu_pages/dialect/dialect.dart';
 import 'package:mashtoz_flutter/ui/widgets/main_page/main_menu_pages/italian_lesson/italian_data_show.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:timezone/data/latest.dart' as tz;
@@ -36,7 +36,7 @@ class NotificationService {
   static final NotificationService _notificationService =
       NotificationService._internal();
 
-  static void initialize(BuildContext context) async {
+  static void initialize(BuildContext? context) async {
     const InitializationSettings initializationSettings =
         InitializationSettings(
             android: AndroidInitializationSettings("@mipmap/ic_launcher_foreground"));
@@ -44,41 +44,36 @@ class NotificationService {
     flutterLocalNotificationsPlugin.initialize(initializationSettings,
 
         onSelectNotification: (String? route) async {
-      if (route != null) {
+      if (route != null && context != null) {
         Map<String, dynamic> noteData = jsonDecode(route);
         String id = noteData.values.toString();
-        print('Notif Dataaaaaaaaa $id');
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (_) => ItaliaLessonShow(
-              idLessons: id,
-            )));
-        if (route.contains('lessons')) {
+
+        if (noteData.containsKey('lessons')) {
           Navigator.of(context).push(MaterialPageRoute(
               builder: (_) => ItaliaLessonShow(
                     idLessons: id,
                   )));
-        } else if (route.contains('libraries')) {
+        } else if (noteData.containsKey('libraries')) {
           Navigator.of(context)
               .push(MaterialPageRoute(builder: (_) => BookInitalScreen(
 
-            idLib: int.tryParse(id),
+            idLib:id,
           )));
-        } else if (route.contains('encyclopedias')) {
+        } else if (noteData.containsKey('encyclopedias')) {
           Navigator.of(context).push(MaterialPageRoute(
               builder: (_) => BookReadScreen(
                     encyId: id,
                   )));
-        } else if (route.contains('audiolibraries')) {
+        } else if (noteData.containsKey('audiolibraries')) {
           Navigator.of(context).push(MaterialPageRoute(
               builder: (_) => AudioLibraryDataShow(
                     adbId: id,
+                   isFromNotifications: true,
                   )));
         } else {
           Navigator.of(context)
-              .push(MaterialPageRoute(builder: (_) => const Dialect()));
+              .push(MaterialPageRoute(builder: (_) => const HomeScreen()));
         }
-
-        Navigator.of(context).pushNamed(route);
       }
     }
     );

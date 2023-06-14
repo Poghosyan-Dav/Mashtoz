@@ -131,17 +131,17 @@ class AuthService {
       }
     }else{
       if(user != null){
-        bool isTrue =   await  _userDataProvider.createUserWithNAmeEmailAndPassword(email: '${user.email}',fullName: '${user.displayName}',
+        var result =   await  _userDataProvider.createUserWithNAmeEmailAndPassword(email: '${user.email}',fullName: '${user.displayName}',
             password: '${user.uid}'
         );
-        if(isTrue){
+        if (result['success']) {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (context) => const HomeScreen(
               ),
             ),
           );
-        } else{
+        }  else{
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
             ..showSnackBar(

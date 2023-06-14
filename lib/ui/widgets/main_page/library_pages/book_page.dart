@@ -23,7 +23,7 @@ class BookInitalScreen extends StatefulWidget {
   final BookCategory? category;
   final Content? book;
   final bool? isFromHomaPage;
-  final int? idLib;
+  final String? idLib;
 
   @override
   State<BookInitalScreen> createState() =>
@@ -37,7 +37,7 @@ class _BookInitalScreenState extends State<BookInitalScreen> {
   Content? book;
   bool isShowingDialog = false;
   final bool? isFromHomePage;
-  final int? idLib;
+  final String? idLib;
   final BookCategory? category;
   bool isValid = false;
   int? custemerId;
@@ -55,7 +55,7 @@ class _BookInitalScreenState extends State<BookInitalScreen> {
         bookDataProvider.getLibraryBooksByCategory(nv.id!).then((value) {
 
           for (var nValue in value!) {
-            if ("(${nValue.id})".toString().contains(idLib.toString())) {
+            if ("(${nValue.id})".toString().contains(idLib!)) {
               book = nValue;
               setState(() {});
               break;

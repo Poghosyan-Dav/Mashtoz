@@ -14,7 +14,7 @@ class RegisterState extends Equatable {
   });
 
   final Email email;
-  final String? errorMessage;
+  final  Map<String, dynamic> ? errorMessage;
   final FullName fullName;
   final Password password;
   final FormzStatus status;
@@ -27,7 +27,7 @@ class RegisterState extends Equatable {
     Email? email,
     Password? password,
     FormzStatus? status,
-    String? errorMessage,
+    Map<String, dynamic> ? errorMessage,
   }) {
     print("from Login State : $status");
     return RegisterState(

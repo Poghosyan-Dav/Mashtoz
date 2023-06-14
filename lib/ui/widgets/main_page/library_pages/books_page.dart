@@ -209,11 +209,11 @@ class BookCard extends StatelessWidget {
               builder: (_) => isFromHomePage ==true?BookInitalScreen(
                 isFromHomaPage: isFromHomePage,
                 book: null,
-                idLib: bookId,
+                idLib: bookId.toString(),
               ):BookInitalScreen(
                 book: isFromAccoungel == true? null : book,
                 category: categorys,
-                idLib: bookId,
+                idLib: bookId.toString(),
               ),
             ),
           );

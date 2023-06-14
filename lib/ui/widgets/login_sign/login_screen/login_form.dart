@@ -29,6 +29,7 @@ class _LoginFormState extends State<LoginForm> {
       listener: (context, state) {
         if (state.status.isSubmissionSuccess) {
           tabProvider.login();
+          context.read<LoginCubit>().logOut();
           if (tabProvider.currentIndex == 4) {
             Navigator.of(context,rootNavigator: true).pushAndRemoveUntil(
                 MaterialPageRoute(builder: (_) => const HomeScreen()),(Route<dynamic> route) => false);
@@ -202,7 +203,7 @@ class _PasswordInputState extends State<PasswordInput> {
                 ),
               ),
               errorText:
-              state.password.error == PassowrdValidatorError.short && !state.password.value.isEmpty ?"նվազագույն երկարությունը 4": null,
+              state.password.error == PassowrdValidatorError.short && !state.password.value.isEmpty ?"նվազագույն երկարությունը 8": null,
             ),
             obscureText: isHiddenPassword,
             onChanged: (password) =>
@@ -234,78 +235,78 @@ class _LoginButtonState extends State<_LoginButton> {
     return BlocBuilder<LoginCubit, LoginState>(
         buildWhen: (previous, current) => previous.status != current.status,
         builder: (context, state) {
-          return SizedBox(
-            width: 47,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                SizedBox(
-                  width: 40,
-                  height: 40,
-                  child: Stack(
-                    alignment: Alignment.centerRight,
-                    children: [
-                      /// bottom
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: const BoxDecoration(boxShadow: [
-                          BoxShadow(
-                            color: Color.fromRGBO(0, 0, 0, 0.1),
-                            spreadRadius: -1,
-                            blurRadius: 1,
-                            offset: Offset(7, 5),
+          return GestureDetector(
+            onTap: ()  {
+
+              if (state.status.isValidated) {
+                context.read<LoginCubit>().loginWithCredentials();
+
+                setState(() {
+                  isTap = true;
+                });
+                isActive();
+              } else {
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(SnackBar(
+                    duration: Duration(milliseconds: 500),
+                    content: Text(
+                      'Տվյալները գտնված չեն։',
+                    )));
+                setState(() {
+                  isTap=false;
+                });
+              }
+              // userDataProvider.logOut();
+            },
+            child: SizedBox(
+              width: 47,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: Stack(
+                      alignment: Alignment.centerRight,
+                      children: [
+                        /// bottom
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: const BoxDecoration(boxShadow: [
+                            BoxShadow(
+                              color: Color.fromRGBO(0, 0, 0, 0.1),
+                              spreadRadius: -1,
+                              blurRadius: 1,
+                              offset: Offset(7, 5),
+                            ),
+                          ]),
+                        ),
+                        Container(
+                          width: 37,
+                          height: 40,
+                          color: state.status.isValidated
+                              ? Palette.main
+                              : Palette.disableButton,
+                        ),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: SizedBox(
+                            width: 26,
+                            child:
+                            SvgPicture.asset('assets/images/Vector 81.svg'),
                           ),
-                        ]),
-                      ),
-                      Container(
-                        width: 37,
-                        height: 40,
-                        color: state.status.isValidated
-                            ? Palette.main
-                            : Palette.disableButton,
-                        child: RawMaterialButton(
-                          splashColor: Palette.whenTapedButton,
-                          onPressed: ()  {
-                            context.read<LoginCubit>().loginWithCredentials();
-                            if (state.status.isValidated) {
-
-
-                              setState(() {
-                                isTap = true;
-                              });
-                              isActive();
-                            } else {
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(SnackBar(
-                                  duration: Duration(milliseconds: 500),
-                                  content: Text(
-                                    'Տվյալները գտնված չեն։',
-                                  )));
-                              setState(() {
-                                isTap=false;
-                              });
-                            }
-                            // userDataProvider.logOut();
-                          },
                         ),
-                      ),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: SizedBox(
-                          width: 26,
-                          child:
-                          SvgPicture.asset('assets/images/Vector 81.svg'),
-                        ),
-                      ),
 
-                      /// top
-                    ],
+                        /// top
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
+
         });
   }
 }

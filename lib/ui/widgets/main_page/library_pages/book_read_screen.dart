@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:mashtoz_flutter/config/palette.dart';
@@ -1264,6 +1263,8 @@ class _BookPagesState extends State<BookPages> {
                                         width: MediaQuery.of(context).size.width,
                                         child: HtmlWidget(
                                           listText,
+                                          onTapUrl: (url)=> _openUrl(url)
+                                          ,
                                         ),
                                         // child: Html(
                                         //    data: listText,
@@ -1374,45 +1375,51 @@ class _BookPagesState extends State<BookPages> {
                                                 endIndent:20,
                                                 thickness: 2,color: Palette.main),
                                             SizedBox(height: 20),
-                                        // Container(
-                                        //   padding: EdgeInsets.only(
-                                        //       left: 16.0, right: 16.0),
-                                        //   width: MediaQuery.of(context).size.width,
-                                        //   child: HtmlWidget(
-                                        //       readScreen != null && readScreen?.explanation != null  ?
-                                        //            '''${readScreen?.explanation}''': searchBodyData != null && searchBodyData?.explanation != null ?
-                                        //            '''${searchBodyData?.explanation}''' : encyclopediaBody != null &&  encyclopediaBody?.explanation != null ? '''${encyclopediaBody?.explanation}''' :  '''''',
-                                        //   ),),
-                                            Padding(
-                                              padding: const EdgeInsets.only(left: 20,right: 20),
-                                              child: Html(
-                                                shrinkWrap: true,
-                                                  onLinkTap: (url, _, __, ___) async {
-                                                    print("Opening $url...");
-                                              if(url!=null){
-                                              if(url.contains('http') || url.contains('https') ){
-                                              if (await canLaunch(url)) {
-                                              await launch(
-                                              url,
-                                              );
-                                              } else {
-                                              throw 'Could not launch $url';
-                                              }
-                                              }
-
-                                                  }},
-                                                  onImageTap: (src, _, __, ___) {
-                                                    print(src);
-                                                  },
-                                                  onImageError: (exception, stackTrace) {
-                                                    print(exception);
-                                                  },
-                                                  data:readScreen != null && readScreen?.explanation != null  ?
-                                                  '''${readScreen?.explanation}''': searchBodyData != null && searchBodyData?.explanation != null ?
-                                                  '''${searchBodyData?.explanation}''' : encyclopediaBody != null &&  encyclopediaBody?.explanation != null ? '''${encyclopediaBody?.explanation}''' :  ''''''),
-
-
-                                            ),
+                                        Container(
+                                          padding: EdgeInsets.only(
+                                              left: 16.0, right: 16.0),
+                                          width: MediaQuery.of(context).size.width,
+                                          child: HtmlWidget(
+                                              readScreen != null && readScreen?.explanation != null  ?
+                                                   '''${readScreen?.explanation}''': searchBodyData != null && searchBodyData?.explanation != null ?
+                                                   '''${searchBodyData?.explanation}''' : encyclopediaBody != null &&  encyclopediaBody?.explanation != null ? '''${encyclopediaBody?.explanation}''' :  '''''',
+                                          ),),
+                                        //     Padding(
+                                        //       padding: const EdgeInsets.only(left: 20,right: 20),
+                                        //       child: Html(
+                                        //         shrinkWrap: true,
+                                        //           onLinkTap: (url, _, __, ___) async {
+                                        //             print("Opening $url...");
+                                        //       if(url!=null){
+                                        //       if(url.contains('http') || url.contains('https') ){
+                                        //       if (await canLaunch(url)) {
+                                        //       await launch(
+                                        //       url,
+                                        //       );
+                                        //       } else {
+                                        //       throw 'Could not launch $url';
+                                        //       }
+                                        //       }
+                                        //
+                                        //           }},
+                                        //           onImageTap: (src, _, __, ___) {
+                                        //             print(src);
+                                        //           },
+                                        //           onImageError: (exception, stackTrace) {
+                                        //             print(exception);
+                                        //           },
+                                        //
+                                        //           data:readScreen != null && readScreen?.explanation != null  ?
+                                        //           '''${readScreen?.explanation}''': searchBodyData != null && searchBodyData?.explanation != null ?
+                                        //           '''${searchBodyData?.explanation}''' : encyclopediaBody != null &&  encyclopediaBody?.explanation != null ? '''${encyclopediaBody?.explanation}''' :  '''''',
+                                        //           style: {
+                                        //             'body': Style(
+                                        //               fontSize: FontSize(
+                                        //                   11),
+                                        //             ),
+                                        //           }                                              ),
+                                        //
+                                        //     ),
                                             SizedBox(height: 20),
 
                                           ],
@@ -1623,6 +1630,21 @@ class _BookPagesState extends State<BookPages> {
     );
 
   }
+  _openUrl(String url) async{
+    if(url!=null){
+      if(url.contains('http') || url.contains('https') ){
+        if (await canLaunch(url)) {
+    await launch(
+    url,
+    );
+    } else {
+    throw 'Could not launch $url';
+    }
+  }
+
+
+  }
+  }
   _launchURL() async {
 
     var url = '${encyclopediaBody?.sharurl}';
@@ -1634,14 +1656,18 @@ class _BookPagesState extends State<BookPages> {
 
 }
 void settingsSheetBody(){
+  final orientation = MediaQuery.of(context).orientation;
+
   showModalBottomSheet(
     context: context,
+    useSafeArea: true,
+    isScrollControlled:  orientation == Orientation.landscape ? true : false,
     builder: (context) {
       return  BookSetings(
       sizeChange: _increaseTextSize,
-      sizeChangeSmall: _decreaseTextSize
-
+      sizeChangeSmall: _decreaseTextSize,
       );
+
     },
   );
 }

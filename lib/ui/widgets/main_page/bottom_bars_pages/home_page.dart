@@ -109,7 +109,8 @@ class HomePageState extends State<HomePage> {
   }
 
  Future<void> _fetchHomeData()async{
-  _bookDataProvider
+   getToken();
+   _bookDataProvider
       .getDialect_Encyclopaedia_Characters(Api.dialectCharacters).then((value) {
 
     charDialects = value;
@@ -124,7 +125,7 @@ class HomePageState extends State<HomePage> {
 
     charAudio = value;
   });
-  getToken();
+
 
   homeDataFuture = _bookDataProvider.getHomeData().then((value) {
     audiolibraries = value.audiolibraries;
@@ -164,6 +165,7 @@ class HomePageState extends State<HomePage> {
 
 }
   void getToken() async {
+
     String? token = await messaging.getToken();
 
     if (token != null && _deviceId != null) {
@@ -171,6 +173,14 @@ class HomePageState extends State<HomePage> {
       print("device_id : ${data['device_id']} &\nfcm_token: ${data['fcm_token']}");
       _userDataProvider.postFCMToken(data);
     }
+
+    messaging.onTokenRefresh.listen((newToken) {
+      if (newToken != null && _deviceId != null) {
+        var data = {'device_id': _deviceId, 'fcm_token': token};
+        print("device_id : ${data['device_id']} &\nfcm_token: ${data['fcm_token']}");
+        _userDataProvider.postFCMToken(data);
+      }
+    });
   }
   Future<void> hasToken() async{
     String? hasToken = await _sessionDataProvider.readsAccessToken();

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mashtoz_flutter/domens/repository/user_data_provider.dart';
 
 import '../../../../config/palette.dart';
+import '../../../../main.dart';
 import '../../helper_widgets/menuShow.dart';
 
 class Contact extends StatefulWidget {
@@ -149,7 +151,8 @@ class _ContactState extends State<Contact> {
       keyboardType: TextInputType.emailAddress,
       validator: (value) {
         if (!value!.contains(RegExp(
-            r'^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$'))) {
+          r'^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*\s*$',
+        ))) {
           return 'Մուտքագրված հասցեն սխալ է';
         }
         return null;
@@ -188,8 +191,9 @@ class _ContactState extends State<Contact> {
       keyboardType: TextInputType.emailAddress,
       validator: (value) {
         if (value!.isEmpty ||
-            !value.contains(RegExp(
-                r"^(?:[ա-ֆԱ-Ֆա-ֆԱ-Ֆ\w+а-яА-Яа-яА-Яa-zA-Z]{2,} [ա-ֆԱ-Ֆա-ֆԱ-Ֆ\w+а-яА-Яа-яА-Яa-zA-Za-zA-Z]{2,}){0,1}$"))) {
+            !value.contains( RegExp(r"^\s*(?:[ա-ֆԱ-Ֆա-ֆԱ-Ֆ\w+а-яА-Яа-яА-Яa-zA-Z]{2,}(?:\s+[ա-ֆԱ-Ֆա-ֆԱ-Ֆ\w+а-яА-Яа-яА-Яa-zA-Za-zA-Z]{2,})*)\s*$")
+        )
+        ) {
           return 'Մուտքագրված տվյալները սխալ են ';
         }
         return null;
@@ -238,8 +242,32 @@ class _ContactState extends State<Contact> {
       },
     );
   }
+    Future<void> _showNotification() async {
+      const AndroidNotificationDetails androidNotificationDetails =
+      AndroidNotificationDetails('your channel id', 'your channel name',
+          channelDescription: 'your channel description',
+          importance: Importance.max,
+          priority: Priority.high,
+          ticker: 'ticker');
+      const NotificationDetails notificationDetails =
+      NotificationDetails(android: androidNotificationDetails);
+      await flutterLocalNotificationsPlugin.show(
+          1, 'plain title', 'plain body', notificationDetails,
+        payload: '{"libraries":"111"}',
+       // payload: '{"encyclopedias":"19"}',
+          // payload: '{"audiolibraries":"8"}',
+      );
+    }
+    /*
+    'libraries',
+    'encyclopedias',
+    'lessons',
+    'audiolibraries',
+    'armenians',
+    */
 
-  Widget sendButton() {
+
+    Widget sendButton() {
     return Container(
         height: 40,
         width: double.infinity,
@@ -249,9 +277,15 @@ class _ContactState extends State<Contact> {
               shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
             ),
             onPressed:isTap ==false? () async {
-              final email = emailController;
-              final name = nameController;
+              String email = emailController;
+              String name = nameController;
               final message = messageConttroller;
+
+
+
+
+              name  = name.replaceAll(RegExp(r'\s+'), ' ');
+              email = email.replaceAll(RegExp(r'\s+'), '');
               Map parameter = {
                 "name": name,
                 "email": email,

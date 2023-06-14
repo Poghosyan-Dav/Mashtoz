@@ -23,14 +23,17 @@ class SignupForm extends StatelessWidget {
       listener: (context, state) {
         if (state.status.isSubmissionSuccess) {
           tabProvider.login();
-
+          context.read<RegisterCubit>().logOut();
           Navigator.of(context,rootNavigator: true)
-              .pushAndRemoveUntil(MaterialPageRoute(builder: (_) => HomeScreen()),(Route<dynamic> route) => false);
+              .pushAndRemoveUntil(MaterialPageRoute(builder: (_) => const HomeScreen()),(Route<dynamic> route) => false);
         } else if (state.status.isSubmissionFailure) {
+          var email = state.errorMessage?['email'];
+          var passwords = state.errorMessage?['password'];
+          final List<dynamic>? error = email ?? passwords ?? ['Register Failure'];
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
             ..showSnackBar(
-              SnackBar(content: Text(state.errorMessage ?? 'Sign Up Failure')),
+              SnackBar(content: Text('${error?[0]}')),
             );
         } else if (state.status.isSubmissionInProgress) {
           ScaffoldMessenger.of(context)
@@ -207,7 +210,7 @@ class _PasswordInputState extends State<PasswordInput> {
               ),
             ),
             errorText: state.password.error == PassowrdValidatorError.invalid && state.password.invalid && !state.password.value.isEmpty  ? 'Գաղտնաբառը պետք է պարունակի 8 նիշ, 1 մեծատառ,\n1 նշան և 1 թիվ' :
-            state.password.error == PassowrdValidatorError.short && state.password.invalid && !state.password.value.isEmpty ?"նվազագույն երկարությունը 4": null,
+            state.password.error == PassowrdValidatorError.short && state.password.invalid && !state.password.value.isEmpty ?"նվազագույն երկարությունը 8": null,
           ),
           obscureText: isHiddenPassword,
           onChanged: (password) =>
@@ -237,65 +240,65 @@ class _SignupButtonState extends State<_SignupButton> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<RegisterCubit, RegisterState>(builder: (context, state) {
-      return SizedBox(
-        width: 47,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          // mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(
-              width: 40,
-              height: 40,
-              child: Stack(
-                //fit: StackFit.expand,
-                alignment: Alignment.centerRight,
-                //overflow: Overflow.visible,
-                children: [
-                  /// bottom
-                  Container(
-                    width: 40,
-                    height: 40,
-                    // color: Colors.orange,
-                    decoration: const BoxDecoration(boxShadow: [
-                      BoxShadow(
-                        color: Color.fromRGBO(0, 0, 0, 0.1),
-                        spreadRadius: -1,
-                        blurRadius: 1,
-                        offset: Offset(7, 5),
-                      ),
-                    ]),
-                  ),
-                  Container(
-                    width: 37,
-                    height: 40,
-                    color: state.status.isValidated
-                        ? Palette.main
-                        : Palette.disableButton,
-                    child: RawMaterialButton(
-                      splashColor: Palette.whenTapedButton,
-                      onPressed: () {
-                        print('Status :: ${state.status.isPure}');
-                        if (state.status.isValidated) {
-                          isActive();
-                          print('Status :: ${state.status.isValidated}');
-                          context.read<RegisterCubit>().signUpCredentials();
-                        }
-                      },
+      return GestureDetector(
+        onTap: (){
+          print('Status :: ${state.status.isPure}');
+        if (state.status.isValidated) {
+          isActive();
+          print('Status :: ${state.status.isValidated}');
+          context.read<RegisterCubit>().signUpCredentials();
+        }},
+        child: SizedBox(
+          width: 47,
+          height: 40,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            // mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                width: 40,
+                height: 40,
+                child: Stack(
+                  //fit: StackFit.expand,
+                  alignment: Alignment.centerRight,
+                  //overflow: Overflow.visible,
+                  children: [
+                    /// bottom
+                    Container(
+                      width: 40,
+                      height: 40,
+                      // color: Colors.orange,
+                      decoration: const BoxDecoration(boxShadow: [
+                        BoxShadow(
+                          color: Color.fromRGBO(0, 0, 0, 0.1),
+                          spreadRadius: -1,
+                          blurRadius: 1,
+                          offset: Offset(7, 5),
+                        ),
+                      ]),
                     ),
-                  ),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: SizedBox(
-                      width: 26,
-                      child: SvgPicture.asset('assets/images/Vector 81.svg'),
-                    ),
-                  ),
+                    Container(
+                      width: 37,
+                      height: 40,
+                      color: state.status.isValidated
+                          ? Palette.main
+                          : Palette.disableButton,
 
-                  /// top
-                ],
+                    ),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: SizedBox(
+                        width: 26,
+                        child: SvgPicture.asset('assets/images/Vector 81.svg'),
+                      ),
+                    ),
+
+                    /// top
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     });

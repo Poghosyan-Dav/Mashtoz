@@ -126,12 +126,12 @@ class UserDataProvider {
 
 
   //Sign Up
-  Future<bool> signUp(
+  Future<Map<String, dynamic>> signUp(
       {required String email,
       required String password,
       required String fullName}) async {
-    bool isSuscces = false;
-
+    //bool isSuscces = false;
+    Map<String, dynamic> isSuscces = {};
     isSuscces = await createUserWithNAmeEmailAndPassword(
         email: email, password: password, fullName: fullName);
 
@@ -200,9 +200,9 @@ class UserDataProvider {
   }
 
   //Signup
-  Future<bool> createUserWithNAmeEmailAndPassword(
+  Future<Map<String, dynamic>> createUserWithNAmeEmailAndPassword(
       {String? email, String? password, String? fullName}) async {
-    Map userData = {
+    Map<String, dynamic> userData = {
       'email': email,
       'password': password,
       'full_name': fullName,
@@ -226,16 +226,19 @@ class UserDataProvider {
         startAccessTimer();
         startRefreshTimer();
 
-        return true;
+        return {'success': true};
       } else {
-        print("failed");
-        return false;
+        var message = body['message'];
+        var errors = body['errors'];
+        return {'success': false, 'message': message, 'errors': errors};
       }
     } catch (e) {
       print(e);
     }
-    return false;
+
+    return {'success': false};
   }
+
 
   //Forgot Password post
   Future<bool> forgotPasswordPost(String email, Function closure) async {
@@ -542,11 +545,11 @@ class UserDataProvider {
   Future<bool> postFCMToken(Map parameters) async {
     try {
       var response = await http.post(
-        Uri.parse(api_url + '/notifications/create-token'),
+        Uri.parse('$api_url/notifications/create-token'),
         headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
+          'Content-Type': 'application/json',
         },
-        body: json.encode(parameters),
+        body: jsonEncode(parameters),
       );
       var success = json.decode(response.body)['success'];
       if (response.statusCode == 200 && success == true) {

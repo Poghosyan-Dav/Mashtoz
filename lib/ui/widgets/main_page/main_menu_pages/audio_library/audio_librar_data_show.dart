@@ -49,10 +49,12 @@ class _AudioLibraryDataShowState extends State<AudioLibraryDataShow> {
           .getDialect_Encyclopaedia_Characters(Api.audioLibrariesCharacters)
           .then((value) {
         for (var nv in value) {
+          print("ForEach$nv");
           bookDataProvider
               .getDataByCharacters(Api.audioLibrariesByCharacters(nv))
               .then((value) {
             for (var nValue in value) {
+              print("ForEach2${nValue.id}");
               if ("(${nValue.id})".toString().contains(adbId.toString())) {
                 dataCharacter = nValue;
                 setState(() {});
