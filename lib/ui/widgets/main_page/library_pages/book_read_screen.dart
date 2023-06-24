@@ -101,7 +101,7 @@ class _BookReadScreenState extends State<BookReadScreen> {
       bookDataProvider.getCategoryLists(Api.categoryListUrl,false).then((value) {
         for (var nv in value) {
           Future.delayed(Duration(microseconds: 1500), () {
-            bookDataProvider.getLibraryBooksByCategory(nv.id!).then((value) {
+            bookDataProvider.getLibraryBooksByCategory(nv.id!,false).then((value) {
               for (var nValue in value!) {
                 // print(nValue.id);
 

@@ -52,7 +52,7 @@ class _BookInitalScreenState extends State<BookInitalScreen> {
     await bookDataProvider.getCategoryLists(Api.categoryListUrl,false).then((value) {
       for (var nv in value) {
         print("Iddddddddd${nv.id}");
-        bookDataProvider.getLibraryBooksByCategory(nv.id!).then((value) {
+        bookDataProvider.getLibraryBooksByCategory(nv.id!,false).then((value) {
 
           for (var nValue in value!) {
             if ("(${nValue.id})".toString().contains(idLib!)) {

@@ -128,14 +128,14 @@ class BookDataProvider {
   //
   //   return libraryList;
   // }
-  Future<List<dynamic>?> getLibraryBooksByCategory(int idCategory) async {
+  Future<List<dynamic>?> getLibraryBooksByCategory(int idCategory,bool isFromPullRefresh) async {
     List<dynamic> libraryList = [];
     List<dynamic>? updatedLibraryList = [];
 
     // Check if response is cached
     var file = await cacheManager?.getFileFromCache(Api.libraryCategoryById(idCategory.toString()));
 
-    if (file != null && file.validTill?.isAfter(DateTime.now()) == true) {
+    if (file != null) {
       print('Fetching from cache');
       var body = await file.file.readAsString();
       var content = json.decode(body)['data']['content'];
@@ -145,42 +145,44 @@ class BookDataProvider {
           libraryList.add(data);
         }
       });
+     if(isFromPullRefresh){
+       // Fetch data from network to check for updates
+       var response = await http.get(
+         Uri.parse(Api.libraryCategoryById(idCategory.toString())),
+         headers: <String, String>{
+           'Content-Type': 'application/json',
+         },
+       );
 
-      // Fetch data from network to check for updates
-      var response = await http.get(
-        Uri.parse(Api.libraryCategoryById(idCategory.toString())),
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-        },
-      );
+       var responseBody = json.decode(response.body);
+       var responseContent = responseBody['data']['content'];
+       var success = responseBody['success'];
 
-      var responseBody = json.decode(response.body);
-      var responseContent = responseBody['data']['content'];
-      var success = responseBody['success'];
+       if (success == true) {
+         List<dynamic>? updatedLibraryList = [];
 
-      if (success == true) {
-        List<dynamic>? updatedLibraryList = [];
+         Map.from(responseContent).forEach((key, value) {
+           if (key.toString().contains(Map.from(value).values.first.toString())) {
+             var data = Content.fromJson(value);
+             if (data != null) {
+               updatedLibraryList.add(data);
+             }
+           }
+         });
 
-        Map.from(responseContent).forEach((key, value) {
-          if (key.toString().contains(Map.from(value).values.first.toString())) {
-            var data = Content.fromJson(value);
-            if (data != null) {
-              updatedLibraryList.add(data);
-            }
-          }
-        });
+         if (!listEquals(updatedLibraryList, libraryList)) {
+           // Cache the response and update the libraryList
+           await cacheManager?.putFile(
+             Api.libraryCategoryById(idCategory.toString()),
+             response.bodyBytes,
+           );
+           libraryList = updatedLibraryList;
+         }
+       } else {
+         print('Failed to fetch data');
+       }
+     }
 
-        if (!listEquals(updatedLibraryList, libraryList)) {
-          // Cache the response and update the libraryList
-          await cacheManager?.putFile(
-            Api.libraryCategoryById(idCategory.toString()),
-            response.bodyBytes,
-          );
-          libraryList = updatedLibraryList;
-        }
-      } else {
-        print('Failed to fetch data');
-      }
 
       return libraryList;
     }
@@ -615,38 +617,53 @@ class BookDataProvider {
       throw Exception(e);
     }
   }
-  // Future<HomeData> getHomeData() async {
-  //   try {
-  //     var response = await http.get(
-  //       Uri.parse(Api.getHomeData),
-  //       headers: <String, String>{
-  //         'Content-Type': 'application/json; charset=UTF-8',
-  //       },
-  //     );
-  //     var body = json.decode(response.body);
-  //     var success = body['success'];
-  //     if (success == true) {
-  //       var data = body['data'] as Map<String, dynamic>;
-  //
-  //       var newData = HomeData.fromJson(data);
-  //
-  //       return newData;
-  //     }
-  //   } catch (e) {
-  //     print(e);
-  //     // throw Exception(e);
-  //   }
-  //   return HomeData();
-  // }
-  Future<HomeData> getHomeData() async {
+
+  Future<HomeData> getHomeData(bool isFromPullRefresh) async {
+    Map<String, dynamic> homeData = {};
+    Map<String, dynamic> updateHomeData = {};
+
     try {
       // Check if response is cached
       var file = await cacheManager.getFileFromCache(Api.getHomeData);
-      if (file != null && file.validTill?.isAfter(DateTime.now()) == true) {
+      if (file != null) {
         print('Fetching from cache');
         var body = await file.file.readAsString();
-        var data = HomeData.fromJson(json.decode(body)['data']);
-        return data;
+        var data = json.decode(body)['data'] as Map<String, dynamic>;
+        homeData = data;
+
+        if (isFromPullRefresh) {
+          // Fetch data from network
+          var response = await http.get(
+            Uri.parse(Api.getHomeData),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+              // Add any additional headers as needed
+            },
+          );
+          var responseBody = json.decode(response.body);
+          var success = responseBody['success'];
+          if (success == true) {
+            var data = responseBody['data'] as Map<String, dynamic>;
+
+            updateHomeData = data;
+
+            if (!mapEquals(updateHomeData, homeData)) {
+              // Cache the response
+              await cacheManager.putFile(
+                Api.getHomeData,
+                response.bodyBytes,
+              );
+              homeData = updateHomeData;
+            }
+          } else {
+            // Handle error case
+            var error = responseBody['error'] ?? 'Unknown error';
+            print('Error: $error');
+            throw Exception(error);
+          }
+        }
+
+        return HomeData.fromJson(homeData);
       }
 
       // Fetch data from network
@@ -661,17 +678,20 @@ class BookDataProvider {
       var success = body['success'];
       if (success == true) {
         var data = body['data'] as Map<String, dynamic>;
-        var newData = HomeData.fromJson(data);
-        // Cache the response
-        await cacheManager.putFile(
-          Api.getHomeData,
-          response.bodyBytes,
-          eTag: response.headers['etag'] ?? '',
-          // Set the maximum cache age (in seconds)
-          maxAge: Duration(seconds: 10),
-          // Set the maximum cache size (in bytes)
-        );
-        return newData;
+        updateHomeData = data;
+
+        if (!mapEquals(updateHomeData, homeData)) {
+          // Cache the response
+          await cacheManager.putFile(
+            Api.getHomeData,
+            response.bodyBytes,
+            eTag: response.headers['etag'] ?? '',
+            // Set the maximum cache age (in seconds)
+            maxAge: Duration(seconds: 10),
+            // Set the maximum cache size (in bytes)
+          );
+          homeData = updateHomeData;
+        }
       } else {
         // Handle error case
         var error = body['error'] ?? 'Unknown error';
@@ -683,7 +703,9 @@ class BookDataProvider {
       print('Exception: $e');
       rethrow;
     }
+    return HomeData.fromJson(homeData);
   }
+
 
 
 }

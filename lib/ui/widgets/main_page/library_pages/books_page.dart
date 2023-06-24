@@ -48,8 +48,18 @@ class _BooksScreenState extends State<BooksScreen> {
 
   @override
   void initState() {
-    contentFuture = bookDataProvider.getLibraryBooksByCategory(category?.id ?? 0);
+    contentFuture = bookDataProvider.getLibraryBooksByCategory(category!.id!,false);
     super.initState();
+  }
+  Future<void> _refreshData() async {
+    final List<dynamic>? newData =
+    await bookDataProvider.getLibraryBooksByCategory(category!.id!, true);
+
+    if (mounted) {
+      setState(() {
+        contentFuture = Future<List<dynamic>?>.value(newData);
+      });
+    }
   }
 
   @override
@@ -125,7 +135,10 @@ class _BooksScreenState extends State<BooksScreen> {
 
                         if (snapshot.hasData) {
                           conentList = snapshot.data ;
-                          return   conentList!.isNotEmpty?  ResponsiveGridList(
+                          return   conentList!.isNotEmpty? RefreshIndicator(
+                              color: Palette.main,
+                              onRefresh:_refreshData,
+                              child:  ResponsiveGridList(
                             horizontalGridSpacing:
                             16, // Horizontal space between grid items
 
@@ -160,7 +173,7 @@ class _BooksScreenState extends State<BooksScreen> {
                                 ),
                               );
                             }),
-                          ) :Center(child: Text('Բովանդակությունը բացակայում է',style: TextStyle(color: Palette.appBarTitleColor))); ;;
+                          ), ) :Center(child: Text('Բովանդակությունը բացակայում է',style: TextStyle(color: Palette.appBarTitleColor))); ;;
                         }
                         return  Container(
                             child: Center(

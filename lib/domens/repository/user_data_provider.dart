@@ -551,19 +551,29 @@ class UserDataProvider {
         },
         body: jsonEncode(parameters),
       );
-      var success = json.decode(response.body)['success'];
-      if (response.statusCode == 200 && success == true) {
-        print('success');
-        return true;
+
+      if (response.statusCode == 200) {
+        var responseBody = response.body;
+        var responseData = json.decode(responseBody);
+
+        var success = responseData['success'];
+        if (success == true) {
+          print('Success');
+          return true;
+        } else {
+          print('Request failed: ${responseData['error']}');
+          return false;
+        }
       } else {
-        print("failed");
-        return false;
+        print('Request failed with status code: ${response.statusCode}');
       }
     } catch (e) {
-      print(e);
+      print('An error occurred: $e');
     }
+
     return false;
   }
+
 
   Future<String?> initPlatformState() async {
     String? deviceId;

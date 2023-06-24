@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -21,6 +22,7 @@ import 'package:mashtoz_flutter/tab_provider.dart';
 import 'package:mashtoz_flutter/ui/utils/day_change_notifire.dart';
 import 'package:mashtoz_flutter/ui/utils/splash_screen.dart';
 import 'package:mashtoz_flutter/ui/widgets/main_page/library_pages/book_inherited_widget.dart';
+import 'package:platform_device_id/platform_device_id.dart';
 import 'package:provider/provider.dart';
 
 import 'domens/models/book_data/book_channgeNotifire.dart';
@@ -86,12 +88,52 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   Locale? _locale;
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+  String? _deviceId;
+  final _userDataProvider = UserDataProvider();
+  Future<void> initPlatformState() async {
+    String? deviceId;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      deviceId = await PlatformDeviceId.getDeviceId;
+    } on PlatformException {
+      deviceId = 'Failed to get deviceId.';
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
+
+    setState(() {
+      _deviceId = deviceId;
+      print("deviceId->$_deviceId");
+    });
+  }
   @override
   void initState() {
-
     super.initState();
+    initPlatformState();
+    getToken();
   }
+  void getToken() async {
 
+    String? token = await messaging.getToken();
+
+    if (token != null && _deviceId != null) {
+      var data = {'device_id': _deviceId, 'fcm_token': token};
+      print("device_id : ${data['device_id']} &\nfcm_token: ${data['fcm_token']}");
+      _userDataProvider.postFCMToken(data);
+    }
+
+    messaging.onTokenRefresh.listen((newToken) {
+      if (newToken != null && _deviceId != null) {
+        var data = {'device_id': _deviceId, 'fcm_token': token};
+        print("device_id : ${data['device_id']} &\nfcm_token: ${data['fcm_token']}");
+        _userDataProvider.postFCMToken(data);
+      }
+    });
+  }
   @override
   Widget build(BuildContext context) {
     final user = UserDataProvider();
