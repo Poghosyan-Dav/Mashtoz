@@ -2,14 +2,16 @@ import 'dart:convert';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mashtoz_flutter/ui/widgets/main_page/home_screen.dart';
 import 'package:mashtoz_flutter/ui/widgets/main_page/library_pages/book_page.dart';
 import 'package:mashtoz_flutter/ui/widgets/main_page/library_pages/book_read_screen.dart';
-import 'package:mashtoz_flutter/ui/widgets/main_page/main_menu_pages/audio_library/audio_librar_data_show.dart';
-import 'package:mashtoz_flutter/ui/widgets/main_page/main_menu_pages/italian_lesson/italian_data_show.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:timezone/data/latest.dart' as tz;
+
+import '../../../domens/blocs/update_home_bloc.dart';
+import '../../../domens/blocs/update_home_event.dart';
 
 final BehaviorSubject<String?> selectNotificationSubject =
     BehaviorSubject<String?>();
@@ -45,32 +47,62 @@ class NotificationService {
 
         onSelectNotification: (String? route) async {
       if (route != null && context != null) {
+        final MyBloc bloc = BlocProvider.of<MyBloc>(context);
         Map<String, dynamic> noteData = jsonDecode(route);
-        String id = noteData.values.toString();
-
-        if (noteData.containsKey('lessons')) {
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (_) => ItaliaLessonShow(
-                    idLessons: id,
-                  )));
-        } else if (noteData.containsKey('libraries')) {
+        //   if (noteData.containsKey('lessons')) {
+        //   Navigator.of(context).push(MaterialPageRoute(
+        //       builder: (_) =>
+        //           ItaliaLessonShow(
+        //             idLessons:noteData['lessons'],
+        //           )));
+        // }
+        if (noteData.containsKey('libraries') &&  noteData['libraries'].toString().isNotEmpty) {
+          print('noteData libraries : ${noteData["libraries"]} : ${noteData["categoryID"]}');
+          var librariesId =     noteData["libraries"].toString();
+          var cateroyId = noteData["categoryID"].toString();
           Navigator.of(context)
-              .push(MaterialPageRoute(builder: (_) => BookInitalScreen(
+              .push(MaterialPageRoute(builder: (_) =>
+              BookInitalScreen(
+                idLib: librariesId,
+                categoryID:cateroyId,
+              ))).then((value) {
+            bloc.add(const UpdateScreenEvent(true));
+          });
+        }
+        else if (noteData.containsKey('libraries') &&  noteData['subld'].toString().isNotEmpty != null) {
+          var subID =     noteData["subld"].toString();
+          var cateroyId = noteData["categoryID"].toString();
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (_) =>
+                  BookReadScreen(
+                    idLib: subID,
+                    categoryId: cateroyId,
+                  ))).then((value) {
+            bloc.add(const UpdateScreenEvent(true));
+          });;
+        }
+        else if (noteData.containsKey('encyclopedias')) {
+          var encyclopediasId =     noteData["encyclopedias"].toString();
+          var character = noteData["character"].toString();
+          print('noteData encyclopedias : $encyclopediasId $character');
 
-            idLib:id,
-          )));
-        } else if (noteData.containsKey('encyclopedias')) {
           Navigator.of(context).push(MaterialPageRoute(
-              builder: (_) => BookReadScreen(
-                    encyId: id,
-                  )));
-        } else if (noteData.containsKey('audiolibraries')) {
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (_) => AudioLibraryDataShow(
-                    adbId: id,
-                   isFromNotifications: true,
-                  )));
-        } else {
+              builder: (_) =>
+                  BookReadScreen(
+                    encyId: encyclopediasId,
+                    character: character,
+                  ))).then((value) {
+            bloc.add(const UpdateScreenEvent(true));
+          });;
+        }
+        else if (noteData.containsKey('audiolibraries')) {
+          // Navigator.of(context).push(MaterialPageRoute(
+          //     builder: (_) => AudioLibraryDataShow(
+          //       adbId: noteData['audiolibraries'] ,
+          //       isFromNotifications: true,
+          //     )));
+        }
+        else {
           Navigator.of(context)
               .push(MaterialPageRoute(builder: (_) => const HomeScreen()));
         }

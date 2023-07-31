@@ -25,6 +25,7 @@ import 'package:mashtoz_flutter/ui/widgets/main_page/library_pages/book_inherite
 import 'package:platform_device_id/platform_device_id.dart';
 import 'package:provider/provider.dart';
 
+import 'domens/blocs/update_home_bloc.dart';
 import 'domens/models/book_data/book_channgeNotifire.dart';
 import 'ui/utils/log_out_changenotifire.dart';
 
@@ -141,6 +142,7 @@ class _MyAppState extends State<MyApp> {
       providers: [
         BlocProvider<LoginCubit>(create: (_) => LoginCubit(user)),
         BlocProvider<RegisterCubit>(create: (_) => RegisterCubit(user)),
+        BlocProvider<MyBloc>(create: (_) => MyBloc()),
       ],
       child: MultiProvider(
         providers: [

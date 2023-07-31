@@ -30,6 +30,7 @@ String? eId, libId;
 class BookReadScreen extends StatefulWidget {
   const BookReadScreen(
       {Key? key,
+        this.character,
         this.saveId,
         this.readScreen,
         this.encyclopediaBody,
@@ -37,9 +38,12 @@ class BookReadScreen extends StatefulWidget {
         this.encyId,
         this.idLib,
         this.isShowTitle,
-        this.isFromHomePage})
+        this.isFromHomePage,
+        this.categoryId})
       : super(key: key);
   final int? saveId;
+  final String? character;
+  final String? categoryId;
   final Data? encyclopediaBody;
   final Content? readScreen;
   final Search? searchData;
@@ -55,17 +59,22 @@ class BookReadScreen extends StatefulWidget {
       isShowTitle: isShowTitle,
       encyId: encyId,
       idLib: idLib,
-      searchData: searchData);
+      searchData: searchData,
+      character:character,
+      categoryId:categoryId,
+  );
 }
 
 class _BookReadScreenState extends State<BookReadScreen> {
   _BookReadScreenState(
-      {this.readScreen,
+      {this.categoryId, this.character,
+        this.readScreen,
         this.encyclopediaBody,
         this.searchData,
         this.encyId,
         this.idLib,
-        this.isShowTitle});
+        this.isShowTitle
+      });
 
   var bookPartsLengt;
   Future<Content?>? content;
@@ -82,6 +91,8 @@ class _BookReadScreenState extends State<BookReadScreen> {
   var textList;
   String? encyId;
   String? idLib;
+  final String? categoryId;
+  final String? character;
   PageController _pageController = PageController(initialPage: 0);
   final bookDataProvider = BookDataProvider();
   @override
@@ -97,71 +108,117 @@ class _BookReadScreenState extends State<BookReadScreen> {
       eId = encyId;
       libId = idLib;
     }
-    if (libId != null) {
-      bookDataProvider.getCategoryLists(Api.categoryListUrl,false).then((value) {
-        for (var nv in value) {
-          Future.delayed(Duration(microseconds: 1500), () {
-            bookDataProvider.getLibraryBooksByCategory(nv.id!,false).then((value) {
-              for (var nValue in value!) {
-                // print(nValue.id);
-
-                // if (nValue == libId) {
-                //   // readScreen = nValue;
-                //   // inspect(readScreen);
-                //   // textList = readScreen!.body!;
-                //   // setState(() {});
-                //   print(nValue);
-                //   break;
-                // }
-              }
-            });
-          });
-        }
-      });
-    }
-    textList =
-    (readScreen?.body != null ? readScreen?.body : encyclopediaBody?.body);
+    if (libId != null) findBookFromPushNotification();
+   if(encyId != null ) findEncyBookFromPushNotification();
     _pageController;
     futureSearchText = getSearchBook();
 
     super.initState();
   }
 
+  Future<void> findEncyBookFromPushNotification() async {
+    try {
+      // Fetch the data using await to make the code cleaner and more readable
+      final value = await bookDataProvider.getDataByCharacters(Api.encyclopediasByCharacters('$character'));
+
+      for (var nValue in value!) {
+        if (nValue.id == int.parse('$encyId')) {
+          setState(() {
+            encyclopediaBody = nValue;
+            textList = encyclopediaBody?.body;
+          });
+          break;
+        }
+      }
+
+      // Call the updated method using await to ensure it's executed after the previous loop
+      await bookDataProvider.updateHomeAfterPushNotification();
+    } catch (e) {
+      // Handle any potential errors here
+      print('Error: $e');
+    }
+  }
+
+  void findBookFromPushNotification() async {
+    bool found = false;
+    await Future.wait([
+      bookDataProvider.updateHomeAfterPushNotification(),
+      if (categoryId == null)
+        bookDataProvider.getCategoryLists(Api.categoryListUrl, false),
+    ]);
+
+    if (categoryId != null) {
+      final books = await bookDataProvider.getLibraryBooksByCategory(int.parse('$categoryId'), true);
+      for (var nValue in books!) {
+        if (nValue.id == int.parse('$idLib')) {
+          print('nValue ${nValue.id}');
+          setState(() {
+            readScreen = nValue;
+            textList = readScreen!.body!;
+          });
+          found = true;
+          break;
+        } else if (nValue.content != null) {
+          // If nValue has subIds, perform recursive search
+          found = findBookInSubContents(nValue.content!.values.toList());
+          if (found) {
+            break;
+          }
+        }
+      }
+    } else {
+      final value = await bookDataProvider.getCategoryLists(Api.categoryListUrl, false);
+      for (var nv in value) {
+        final books = await bookDataProvider.getLibraryBooksByCategory(nv.id!, true);
+        for (var nValue in books!) {
+          if (nValue.id == int.parse('$idLib')) {
+            print('nValue ${nValue.id}');
+            setState(() {
+              readScreen = nValue;
+              textList = readScreen!.body!;
+            });
+            found = true;
+            break;
+          } else if (nValue.content != null) {
+            // If nValue has subIds, perform recursive search
+            found = findBookInSubContents(nValue.content!.values.toList());
+            if (found) {
+              break;
+            }
+          }
+        }
+      }
+    }
+
+  }
+
+  bool findBookInSubContents(List<Content> subContents) {
+    for (var subValue in subContents) {
+      if (subValue.id == int.parse('$idLib')) {
+        print('subId ${subValue.id}');
+
+        setState(() {
+          readScreen = subValue;
+          textList = readScreen!.body!;
+        });
+        return true;
+      } else if (subValue.content != null) {
+        // If subValue has subIds, perform recursive search
+        if (findBookInSubContents(subValue.content!.values.toList())) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
   Future<Data?> getSearchBook() async {
     return await searchBookProvider.fetchBook(
         type: searchData?.type, id: searchData?.id);
   }
 
-  // //Book data add
-  // List<String>? bookGengerator(String? x) {
-  //   var textList = <String>[];
-
-  //   print(x?.length);
-  //   var indexCharacter;
-  //   var cutCount = SizeConfig.screenWidth!.floor();
-
-  //   if (x != null && x.length < cutCount) {
-  //     cutCount = x.length;
-  //     indexCharacter = x.indexOf(' ', cutCount);
-  //   } else {
-  //     indexCharacter = x?.indexOf(' ', cutCount);
-  //   }
-
-  //   var count = x != null ? (x.length / indexCharacter).floor() : 0;
-
-  //   for (var i = 0; i < count; i++) {
-  //     final a = x!.substring(0, indexCharacter);
-  //     textList.add(a);
-
-  //     x = x.substring(cutCount, x.length);
-  //   }
-  //   textList.add(x ?? '');
-  //   return textList;
-  // }
 
   @override
   Widget build(BuildContext context) {
-    print(widget.isFromHomePage);
     return searchData != null
         ? FutureBuilder<Data?>(
       future: futureSearchText,
@@ -192,7 +249,7 @@ class _BookReadScreenState extends State<BookReadScreen> {
         }
       },
     )
-        : BookPages(
+        : (readScreen!= null ) || (encyclopediaBody != null) ? BookPages(
       encId: widget.encyId,
       saveId: widget.saveId,
       listText: textList != null ? textList : '',
@@ -202,7 +259,9 @@ isFromHomePage: widget.isFromHomePage,
       dynamicPageCounts: count,
       isShowTitle: isShowTitle,
       //   isVisiblty: isVisiblty,
-    );
+    ):   const Center(child: CircularProgressIndicator(
+      color:Palette.main,
+    ),);
   }
 }
 
@@ -271,6 +330,7 @@ class _BookPagesState extends State<BookPages> {
     this.encId,
     this.dynamicPageCounts,
   });
+
   final Search? searchData;
   final int? pageCounts;
   final bool? isShowTitle;
@@ -278,7 +338,7 @@ class _BookPagesState extends State<BookPages> {
   final PageController? controller;
   int? custemerId;
   String? encId;
-  int?  saveId;
+  int? saveId;
   bool isShowingDialog = false;
 
   Data? encyclopediaBody;
@@ -302,43 +362,9 @@ class _BookPagesState extends State<BookPages> {
   double _textSize = 16.0;
   final userDataProvider = UserDataProvider();
   final bookDataProvider = BookDataProvider();
-  @override
-  void initState() {
-
-    if (encId != null) {
-      bookDataProvider
-          .getDialect_Encyclopaedia_Characters(encId != null
-          ? Api.encyclopediasCharacters
-          : libId != null
-          ? Api.dialectCharacters
-          : Api.audioLibrariesCharacters)
-          .then((value) {
-        for (var nv in value) {
-          bookDataProvider
-              .getDataByCharacters(Api.encyclopediasByCharacters(nv))
-              .then((value) {
-            for (var nValue in value) {
-              if ('(${nValue.id})'.toString().contains(encId.toString())) {
-                setState(() {
-                  encyclopediaBody = nValue;
-                  listText = encyclopediaBody!.body!;
-                });
-                break;
-
-              }
-            }
-          });
-        }
-      });
-    }
-
-    super.initState();
-  }
-
   void _increaseTextSize() {
     setState(() {
       _textSize = (_textSize + 2.0).clamp(16.0, 30.0);
-
     });
   }
 
@@ -368,10 +394,10 @@ class _BookPagesState extends State<BookPages> {
               child: Center(
                 child: InkWell(
                   onTap: () {
-                   setState(() {
-                     isVisiblty = !isVisiblty;
-                     isBovandakMenu = false;
-                   });
+                    setState(() {
+                      isVisiblty = !isVisiblty;
+                      isBovandakMenu = false;
+                    });
                   },
                   child: SvgPicture.asset(
                     'assets/images/arrow.svg',
@@ -383,15 +409,16 @@ class _BookPagesState extends State<BookPages> {
         Spacer(),
         Container(
             child: InkWell(
-              onTap: () => setState(() {
-                isBovandakMenu = !isBovandakMenu;
-                isFavorite = false;
+              onTap: () =>
+                  setState(() {
+                    isBovandakMenu = !isBovandakMenu;
+                    isFavorite = false;
 
-                isSettings = false;
-                isShare = false;
-                isYoutubeActive = false;
-                //  print("BovandakMenu :: $isBovandakMenu");
-              }),
+                    isSettings = false;
+                    isShare = false;
+                    isYoutubeActive = false;
+                    //  print("BovandakMenu :: $isBovandakMenu");
+                  }),
               child: SvgPicture.asset(
                 'assets/images/bovandakutyun_menu.svg',
                 color: isBovandakMenu ? Palette.whenTapedButton : null,
@@ -432,8 +459,12 @@ class _BookPagesState extends State<BookPages> {
   }
 
   Widget hideBottomBarMenu() {
-    final mediaQuery = MediaQuery.of(context).size;
-    final book = context.read<ContentProvider>().bookContents;
+    final mediaQuery = MediaQuery
+        .of(context)
+        .size;
+    final book = context
+        .read<ContentProvider>()
+        .bookContents;
     final theme = context.read<ThemeNotifier>();
 
     return Stack(
@@ -475,7 +506,8 @@ class _BookPagesState extends State<BookPages> {
                                 child: Text(
                                   searchData?.title != null
                                       ? '${searchData?.title} '
-                                      : isShowTitle == true && book?.title != null
+                                      : isShowTitle == true &&
+                                      book?.title != null
                                       ? '${book?.title}'
                                       : '${encyclopediaBody?.title}',
                                   textAlign: TextAlign.center,
@@ -497,7 +529,8 @@ class _BookPagesState extends State<BookPages> {
                                 child: Text(
                                   searchBodyData?.author != null
                                       ? '${searchBodyData?.author}'
-                                      : isShowTitle == true && book?.title != null
+                                      : isShowTitle == true &&
+                                      book?.title != null
                                       ? '${book?.author}'
                                       : '',
                                   textAlign: TextAlign.center,
@@ -557,13 +590,14 @@ class _BookPagesState extends State<BookPages> {
                               children: [
                                 Expanded(
                                     child: InkWell(
-                                      onTap: () => setState(() {
-                                        isYoutubeActive = !isYoutubeActive;
-                                        isSettings = false;
-                                        isShare = false;
-                                        isFavorite = false;
-                                        isBovandakMenu = false;
-                                      }),
+                                      onTap: () =>
+                                          setState(() {
+                                            isYoutubeActive = !isYoutubeActive;
+                                            isSettings = false;
+                                            isShare = false;
+                                            isFavorite = false;
+                                            isBovandakMenu = false;
+                                          }),
                                       child: SvgPicture.asset(
                                         'assets/images/youtube.svg',
                                         color: isYoutubeActive
@@ -574,15 +608,17 @@ class _BookPagesState extends State<BookPages> {
                                     )),
                                 Expanded(
                                     child: InkWell(
-                                      onTap: ()  {
-                                        if (!isShare && widget.isFromHomePage == null){
-                                           Share.share(
+                                      onTap: () {
+                                        if (!isShare &&
+                                            widget.isFromHomePage == null) {
+                                          Share.share(
                                             searchBodyData?.sharurl != null
                                                 ? '${searchBodyData?.sharurl} '
                                                 : isShowTitle == true &&
                                                 readScreen?.sharurl != null
                                                 ? '${readScreen?.sharurl}'
-                                                : '${encyclopediaBody?.sharurl}',
+                                                : '${encyclopediaBody
+                                                ?.sharurl}',
                                           ).then((value) {
                                             setState(() {
                                               isShare = false;
@@ -594,23 +630,25 @@ class _BookPagesState extends State<BookPages> {
                                             });
                                           });
                                         }
-                                        if (!isShare && widget.isFromHomePage == true){
-                                        if(readScreen?.sharurl != null)  Share.share('${readScreen?.sharurl} ').then((value) {
-                                          setState(() {
-                                            isShare = false;
-                                            isYoutubeActive = false;
-                                            isSettings = false;
+                                        if (!isShare &&
+                                            widget.isFromHomePage == true) {
+                                          if (readScreen?.sharurl != null) Share
+                                              .share('${readScreen?.sharurl} ')
+                                              .then((value) {
+                                            setState(() {
+                                              isShare = false;
+                                              isYoutubeActive = false;
+                                              isSettings = false;
 
-                                            isFavorite = false;
-                                            isBovandakMenu = false;
+                                              isFavorite = false;
+                                              isBovandakMenu = false;
+                                            });
                                           });
-                                        });
                                         }
 
-                                          setState(() {
+                                        setState(() {
                                           isShare = true;
-
-                                          });
+                                        });
                                       },
                                       child: SvgPicture.asset(
                                         'assets/images/share.svg',
@@ -682,7 +720,7 @@ class _BookPagesState extends State<BookPages> {
                 : Container(),
             isYoutubeActive ? youtubeShow() : Container(),
             //isFavorite ? favoriteShow() : Container(),
-           // isSettings ? settingsShow() : Container(),
+            // isSettings ? settingsShow() : Container(),
           ],
         ),
       ],
@@ -690,10 +728,13 @@ class _BookPagesState extends State<BookPages> {
   }
 
   Widget youtubeShow() {
-
-    final mediaQuery = MediaQuery.of(context).size;
+    final mediaQuery = MediaQuery
+        .of(context)
+        .size;
     final theme = context.read<ThemeNotifier>();
-    final orentation = MediaQuery.of(context).orientation;
+    final orentation = MediaQuery
+        .of(context)
+        .orientation;
     return Container(
 
         color: Color.fromRGBO(31, 31, 31, 0.5),
@@ -708,21 +749,22 @@ class _BookPagesState extends State<BookPages> {
                       ? theme.backgroundColor
                       : Palette.textLineOrBackGroundColor,
                   width: mediaQuery.width,
-                  padding: EdgeInsets.only(top: 20,bottom: 20),
+                  padding: EdgeInsets.only(top: 20, bottom: 20),
 
                   child: Align(
                     alignment: Alignment.topCenter,
                     child: GestureDetector(
-                      onTap: (){
+                      onTap: () {
                         Navigator.of(context, rootNavigator: true)
                             .push(MaterialPageRoute(
-                            builder: (_) => VideoView(
-                              link:  readScreen?.videoLink!= null
-                                  ? '${readScreen?.videoLink!}'
-                                  : searchBodyData?.video_link != null
-                                  ? '${searchBodyData?.video_link!}'
-                                  : "${encyclopediaBody?.video_link!}"
-                            )));
+                            builder: (_) =>
+                                VideoView(
+                                    link: readScreen?.videoLink != null
+                                        ? '${readScreen?.videoLink!}'
+                                        : searchBodyData?.video_link != null
+                                        ? '${searchBodyData?.video_link!}'
+                                        : "${encyclopediaBody?.video_link!}"
+                                )));
                       },
                       child: Container(
                         width: orentation == Orientation.landscape
@@ -742,11 +784,16 @@ class _BookPagesState extends State<BookPages> {
                                   alignment: Alignment.center,
                                   child: CachedNetworkImage(
                                     useOldImageOnUrlChange: true,
-                                    imageUrl: YoutubeThumbnail(youtubeId: getIdFromUrl(readScreen?.videoLink!= null
-                                        ? '${readScreen?.videoLink!}'
-                                        : searchBodyData?.video_link != null
-                                        ? '${searchBodyData?.video_link!}'
-                                        : "${encyclopediaBody?.video_link!}")).hd(),
+                                    imageUrl: YoutubeThumbnail(
+                                        youtubeId: getIdFromUrl(
+                                            readScreen?.videoLink != null
+                                                ? '${readScreen?.videoLink!}'
+                                                : searchBodyData?.video_link !=
+                                                null
+                                                ? '${searchBodyData
+                                                ?.video_link!}'
+                                                : "${encyclopediaBody
+                                                ?.video_link!}")).hd(),
                                     fit: BoxFit.contain,
                                   )),
                             Positioned.fill(
@@ -771,9 +818,13 @@ class _BookPagesState extends State<BookPages> {
   }
 
   Widget favoriteShow() {
-    final mediaQuery = MediaQuery.of(context).size;
+    final mediaQuery = MediaQuery
+        .of(context)
+        .size;
     final theme = context.read<ThemeNotifier>();
-    final orentation = MediaQuery.of(context).orientation;
+    final orentation = MediaQuery
+        .of(context)
+        .orientation;
 
     return Positioned(
       top: 90,
@@ -903,10 +954,13 @@ class _BookPagesState extends State<BookPages> {
   }
 
 
-
   Widget shareShow() {
-    final mediaQuery = MediaQuery.of(context).size;
-    final orentation = MediaQuery.of(context).orientation;
+    final mediaQuery = MediaQuery
+        .of(context)
+        .size;
+    final orentation = MediaQuery
+        .of(context)
+        .orientation;
 
     final theme = context.read<ThemeNotifier>();
     return Padding(
@@ -917,8 +971,14 @@ class _BookPagesState extends State<BookPages> {
           children: [
             Positioned(
               top: orentation == Orientation.landscape
-                  ? MediaQuery.of(context).size.height / 3
-                  : MediaQuery.of(context).size.height / 1.48,
+                  ? MediaQuery
+                  .of(context)
+                  .size
+                  .height / 3
+                  : MediaQuery
+                  .of(context)
+                  .size
+                  .height / 1.48,
               child: Container(
                 color: theme.backgroundColor != null
                     ? theme.backgroundColor
@@ -929,7 +989,10 @@ class _BookPagesState extends State<BookPages> {
                   children: [
                     Expanded(
                         child: Container(
-                          height: MediaQuery.of(context).size.height,
+                          height: MediaQuery
+                              .of(context)
+                              .size
+                              .height,
                           child: Column(
                             children: [
                               SizedBox(height: 15.0),
@@ -968,7 +1031,8 @@ class _BookPagesState extends State<BookPages> {
                               ),
                               Container(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment
+                                        .center,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       SizedBox(height: 10.0),
@@ -980,7 +1044,8 @@ class _BookPagesState extends State<BookPages> {
                                               'assets/images/messenger 2.svg'),
                                           SvgPicture.asset(
                                               'assets/images/whatsapp 2.svg'),
-                                          SvgPicture.asset('assets/images/gmail 2.svg'),
+                                          SvgPicture.asset(
+                                              'assets/images/gmail 2.svg'),
                                           SvgPicture.asset(
                                               'assets/images/messenger 2.svg'),
                                           SvgPicture.asset(
@@ -1007,20 +1072,19 @@ class _BookPagesState extends State<BookPages> {
   }
 
   void userIsSign() async {
-    final tabProvider = Provider.of<TabProvider>(context,listen: false);
+    final tabProvider = Provider.of<TabProvider>(context, listen: false);
 
-    var data = <String,dynamic>{};
+    var data = <String, dynamic>{};
     String type = encyclopediaBody != null ? 'encyclopedias'
-        : readScreen != null ? 'libraries':
+        : readScreen != null ? 'libraries' :
 
-    searchData != null ? 'encyclopedias' :  'libraries';
+    searchData != null ? 'encyclopedias' : 'libraries';
     int? id = encyclopediaBody != null ? encyclopediaBody?.id
-        : readScreen != null ? widget.saveId:
+        : readScreen != null ? widget.saveId :
 
-    searchData != null ? encyclopediaBody?.id :   widget.saveId ?? searchData?.id;
- await   userDataProvider.fetchUserInfo().then((value) {
-
-   data = <String,dynamic>{
+    searchData != null ? encyclopediaBody?.id : widget.saveId ?? searchData?.id;
+    await userDataProvider.fetchUserInfo().then((value) {
+      data = <String, dynamic>{
         'type':
         type,
         'type_id':
@@ -1029,555 +1093,356 @@ class _BookPagesState extends State<BookPages> {
         value?.id,
       };
     });
-   if(data.isNotEmpty){
-     tabProvider.updateSaveData(data,context);
-     if(!isShowingDialog){
-       isShowingDialog = true;
-       showDialog(
-           context: context,
-           barrierDismissible: false,
-           builder: (
-               context,
-               ) =>
-               SaveShowDialog(
-                 data:data,
-                 isShow: false,
-               )).then((_) {
-         isShowingDialog = false;
-       });
-     }
-
-
-   }
-
-
+    if (data.isNotEmpty) {
+      tabProvider.updateSaveData(data, context);
+      if (!isShowingDialog) {
+        isShowingDialog = true;
+        showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context,) =>
+                SaveShowDialog(
+                  data: data,
+                  isShow: false,
+                )).then((_) {
+          isShowingDialog = false;
+        });
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = context.read<ThemeNotifier>();
-    var theme = appTheme.theme != null ? appTheme.theme : appTheme.lightTheme;
-    return readScreen != null || encyclopediaBody != null || searchData != null
-        ? Theme(
-      data: theme,
-      child: SafeArea(
-        child: Scaffold(
-            body: GestureDetector(
-              onTap: (){
-                setState(() {
-                  isVisiblty = false;
-                  isBovandakMenu = false;
-                });
-              },
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                child: Stack(
+    final appTheme = context.watch<ThemeNotifier>();
+    var theme = appTheme.theme ?? appTheme.lightTheme;
+
+    return Scaffold(
+      body: SafeArea(
+        child: GestureDetector(
+          onTap: () {
+            setState(() {
+              isVisiblty = false;
+              isBovandakMenu = false;
+            });
+          },
+          child: Stack(
+            children: [
+              Container(
+                width: MediaQuery
+                    .of(context)
+                    .size
+                    .width,
+                height: MediaQuery
+                    .of(context)
+                    .size
+                    .height,
+                color: appTheme.readBookBackgroundColor ??
+                    Color.fromRGBO(226, 225, 224, 1),
+                child: Column(
                   children: [
-
-                    Container(
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height,
-                      color: appTheme.readBookBackgroundColor != null
-                          ? appTheme.readBookBackgroundColor
-                          : Color.fromRGBO(226, 225, 224, 1),
-                      child: Column(
-                        children: [
-                          SizedBox(height: 20),
-                          Expanded(
-                            child: RawScrollbar(
-                                thumbColor: Palette.whenTapedButton,
-                                thickness: 5,
-                                crossAxisMargin: 5,
-                                radius: const Radius.circular(12),
-                                thumbVisibility: true,
-                                child: ListView(
-                                    shrinkWrap: true,
-                                    children: [
-                                  Column(
-                                    children: [
-                                      Container(
-                                        height: 238,
-                                        width: double.infinity,
-                                        child: Stack(
-                                          children: [
-                                            Positioned.fill(
-                                                bottom: 49,
-                                                child: Align(
-                                                    alignment:
-                                                    Alignment.center,
-                                                    child: Container(
-                                                      height: 94,
-                                                      width: double.infinity,
-                                                      color: Color.fromRGBO(
-                                                          164, 171, 189, 1),
-                                                    ))),
-                                            Positioned.fill(
-                                                child: Align(
-                                                    alignment:
-                                                    Alignment.topCenter,
-                                                    child: Container(
-                                                      height: 180,
-                                                      width: 140,
-                                                      decoration:
-                                                      BoxDecoration(
-                                                        color: Palette
-                                                            .textLineOrBackGroundColor,
-                                                        border: Border.all(
-                                                          color:
-                                                          Color.fromRGBO(
-                                                              51,
-                                                              51,
-                                                              51,
-                                                              1),
-                                                          width: 01,
-                                                        ),
-                                                      ),
-                                                      child: Stack(
-                                                        children: [
-                                                          if (encyclopediaBody
-                                                              ?.image !=
-                                                              null ||
-                                                              readScreen
-                                                                  ?.image !=
-                                                                  null || searchData?.image != null)
-                                                            Positioned.fill(
-                                                                child: Align(
-                                                                  alignment:
-                                                                  Alignment
-                                                                      .center,
-                                                                  child: SizedBox(
-                                                                      height: 164.0,
-                                                                      width: 122.0,
-                                                                      child: CachedNetworkImage(
-                                                                        imageUrl: encyclopediaBody !=
-                                                                            null
-                                                                            ? '${encyclopediaBody?.image}'
-                                                                            : readScreen?.image!= null ?'${readScreen?.image}':
-                                                                        '${searchData?.image}',
-                                                                        fit: BoxFit
-                                                                            .fill,
-                                                                      )),
-                                                                ))
-                                                        ],
-                                                      ),
-                                                    ))),
-
-                                                 Positioned.fill(
-                                                child: Align(
-                                                  alignment: Alignment
-                                                      .bottomCenter,
-                                                  child: Container(
-                                                      padding:
-                                                      EdgeInsets.only(
-                                                          left: 20.0,
-                                                          right: 20.0),
-                                                      color: Palette
-                                                          .textLineOrBackGroundColor,
-                                                      width:
-                                                      double.infinity,
-                                                      height: 49,
-                                                      child: Row(
-                                                        children: [
-                                                          InkWell(
-                                                            onTap:
-                                                                () async {
-                                                              String? share = encyclopediaBody != null? encyclopediaBody?.sharurl :
-                                                                  searchBodyData != null ? searchBodyData?.sharurl : readScreen != null
-                                                                      ? readScreen?.sharurl :searchBodyData?.sharurl ;
-
-
-                                                              await Share.share(share!);
-                                                              print(
-                                                                  'dadas');
-                                                              // showDialog(
-                                                              //     context:
-                                                              //         context,
-                                                              //     barrierDismissible:
-                                                              //         true,
-                                                              //     builder: (
-                                                              //       context,
-                                                              //     ) =>
-                                                              //         SaveShowDialog(
-                                                              //             isShow:
-                                                              //                 false));
-                                                            },
-                                                            child: Row(
-                                                              children: [
-                                                                //  const SizedBox(width: 16),
-                                                                SvgPicture
-                                                                    .asset(
-                                                                    'assets/images/այքըններ.svg'),
-                                                                const SizedBox(
-                                                                    width:
-                                                                    6),
-                                                                const Text(
-                                                                    'Կիսվել')
-                                                              ],
-                                                            ),
-                                                          ),
-                                                          Spacer(),
-                                                          InkWell(
-                                                            onTap: () =>userIsSign(),
-                                                            child: Row(
-                                                              children: [
-                                                                SvgPicture
-                                                                    .asset(
-                                                                    'assets/images/վելացնել1.svg'),
-                                                                const SizedBox(
-                                                                    width:
-                                                                    6),
-                                                                const Text(
-                                                                    'Պահել'),
-                                                                //const SizedBox(width: 16),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      )),
-                                                ))
-
-                                          ],
-                                        ),
-                                      ),
-                                      SizedBox(height: 16.0),
-                                      Center(
-                                          child: SizedBox(
-                                              width: 235,
-                                              child: Text(
-                                                encyclopediaBody != null
-                                                    ? '${encyclopediaBody?.title ?? ''}'
-                                                    :readScreen?.title != null ? '${readScreen?.title }' : '${searchBodyData?.title ?? ''}',
-                                                style: TextStyle(
-                                                    fontFamily:
-                                                    'GHEAGrapalat',
-                                                    fontSize: 16.0,
-                                                    fontWeight:
-                                                    FontWeight.w700,
-                                                    letterSpacing: 1),
-                                                textAlign: TextAlign.center,
-                                              ))),
-                                      Container(
-                                        padding: EdgeInsets.only(
-                                            left: 16.0, right: 16.0),
-                                        width: MediaQuery.of(context).size.width,
-                                        child: HtmlWidget(
-                                          listText,
-                                          onTapUrl: (url)=> _openUrl(url)
-                                          ,
-                                        ),
-                                        // child: Html(
-                                        //    data: listText,
-                                        //   // document: dom.Document.html(listText),
-                                        //   onCssParseError: (css, messages) {
-                                        //     debugPrint("css that errored: $css");
-                                        //     debugPrint("error messages:");
-                                        //     for (var element in messages) {
-                                        //       debugPrint(element.toString());
-                                        //     }
-                                        //     return '';
-                                        //   },
-                                        //
-                                        //   customRenders: {
-                                        //     tagMatcher("table"): CustomRender.widget(
-                                        //       widget: (context, buildChildren) => SizedBox(
-                                        //         child: NotificationListener<ScrollNotification>(
-                                        //           onNotification: (notification) => true,
-                                        //           child: SingleChildScrollView(
-                                        //             scrollDirection: Axis.horizontal,
-                                        //             child: tableRender.call().widget!.call(context, buildChildren),
-                                        //           ),
-                                        //         ),
-                                        //       ),
-                                        //     ),
-                                        //   },
-                                        //
-                                        //   shrinkWrap: true,
-                                        //     onLinkTap: (url, _, __, ___) async{
-                                        //       print("Opening $url...");
-                                        //       if(url!=null){
-                                        //         if(url.contains('http') || url.contains('https') ){
-                                        //           if (await canLaunch(url)) {
-                                        //             await launch(
-                                        //               url,
-                                        //             );
-                                        //           } else {
-                                        //             throw 'Could not launch $url';
-                                        //           }
-                                        //       }
-                                        //
-                                        //
-                                        //     }
-                                        //     },
-                                        //     onImageTap: (src, _, __, ___) {
-                                        //       print(src);
-                                        //     },
-                                        //     onImageError: (exception, stackTrace) {
-                                        //       print(exception);
-                                        //     },
-                                        //
-                                        //   style: {
-                                        //     'body': Style(
-                                        //       fontSize:  FontSize(_textSize),
-                                        //     ),
-                                        //
-                                        //
-                                        //
-                                        //     'table': Style(
-                                        //       width: Width(MediaQuery.of(context).size.width),
-                                        //       // reduce width by 100 pixels
-                                        //       lineHeight: LineHeight.em(1.3),
-                                        //     ),
-                                        //     'td': Style(
-                                        //
-                                        //       alignment: Alignment.centerLeft,
-                                        //       after: ' ',
-                                        //     ),
-                                        //     'tr': Style(
-                                        //       width: Width(MediaQuery.of(context).size.width-100),
-                                        //       whiteSpace: WhiteSpace.pre,
-                                        //       alignment: Alignment.center,
-                                        //
-                                        //     ),
-                                        //     'img':Style(
-                                        //
-                                        //         width: Width(MediaQuery.of(context).size.width-30),
-                                        //         alignment: Alignment.center,
-                                        //
-                                        //     ),
-                                        //     'span': Style(
-                                        //       fontSize: FontSize(17),
-                                        //         width: Width(MediaQuery.of(context).size.width/2),
-                                        //
-                                        //         alignment: Alignment.center,
-                                        //       maxLines: 2,
-                                        //       after: ' ',
-                                        //       textOverflow: TextOverflow.visible
-                                        //
-                                        //     ),
-                                        //
-                                        //
-                                        //   },
-                                        //
-                                        // ),
-
-                                      ),
-                                      //Container(padding: EdgeInsets.only(left: 16.0,right: 16.0),child: RichText(text: textSpan),),
-                                      if(readScreen != null && readScreen?.explanation != null || searchData != null &&  searchBodyData?.explanation != null ||  encyclopediaBody != null && encyclopediaBody?.explanation != null)
-                                      SizedBox(height: 20,),
-                                      Container(
-                                        padding: EdgeInsets.only(top: 10,bottom: 5),
-                                        color: Colors.white,
-                                        child: Column(
-                                          children: [
-                                            const Divider(
-                                                indent: 20,
-                                                endIndent:20,
-                                                thickness: 2,color: Palette.main),
-                                            SizedBox(height: 20),
-                                        Container(
-                                          padding: EdgeInsets.only(
-                                              left: 16.0, right: 16.0),
-                                          width: MediaQuery.of(context).size.width,
-                                          child: HtmlWidget(
-                                              readScreen != null && readScreen?.explanation != null  ?
-                                                   '''${readScreen?.explanation}''': searchBodyData != null && searchBodyData?.explanation != null ?
-                                                   '''${searchBodyData?.explanation}''' : encyclopediaBody != null &&  encyclopediaBody?.explanation != null ? '''${encyclopediaBody?.explanation}''' :  '''''',
-                                          ),),
-                                        //     Padding(
-                                        //       padding: const EdgeInsets.only(left: 20,right: 20),
-                                        //       child: Html(
-                                        //         shrinkWrap: true,
-                                        //           onLinkTap: (url, _, __, ___) async {
-                                        //             print("Opening $url...");
-                                        //       if(url!=null){
-                                        //       if(url.contains('http') || url.contains('https') ){
-                                        //       if (await canLaunch(url)) {
-                                        //       await launch(
-                                        //       url,
-                                        //       );
-                                        //       } else {
-                                        //       throw 'Could not launch $url';
-                                        //       }
-                                        //       }
-                                        //
-                                        //           }},
-                                        //           onImageTap: (src, _, __, ___) {
-                                        //             print(src);
-                                        //           },
-                                        //           onImageError: (exception, stackTrace) {
-                                        //             print(exception);
-                                        //           },
-                                        //
-                                        //           data:readScreen != null && readScreen?.explanation != null  ?
-                                        //           '''${readScreen?.explanation}''': searchBodyData != null && searchBodyData?.explanation != null ?
-                                        //           '''${searchBodyData?.explanation}''' : encyclopediaBody != null &&  encyclopediaBody?.explanation != null ? '''${encyclopediaBody?.explanation}''' :  '''''',
-                                        //           style: {
-                                        //             'body': Style(
-                                        //               fontSize: FontSize(
-                                        //                   11),
-                                        //             ),
-                                        //           }                                              ),
-                                        //
-                                        //     ),
-                                            SizedBox(height: 20),
-
-                                          ],
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ])),
-                          ),
-                          SizedBox(height: 20),
-                        ],
+                    SizedBox(height: 20),
+                    Expanded(
+                      child: RawScrollbar(
+                        thumbColor: Palette.whenTapedButton,
+                        thickness: 5,
+                        crossAxisMargin: 5,
+                        radius: const Radius.circular(12),
+                        thumbVisibility: true,
+                        child: ListView(
+                          shrinkWrap: true,
+                          children: [
+                            _buildContent(theme,appTheme),
+                            SizedBox(height: 20),
+                          ],
+                        ),
                       ),
                     ),
-                    Positioned.fill(
-                      right: 20,
-                      top: 8,
-                      child: Align(alignment: Alignment.topRight,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    SizedBox(height: 20),
+                  ],
+                ),
+              ),
+              Positioned.fill(
+                right: 20,
+                top: 8,
+                child: Align(
+                  alignment: Alignment.topRight,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        icon: Icon(Icons.arrow_back_ios_new_outlined, size: 20,
+                            color: Palette.barColor),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          settingsSheetBody();
+                        },
+                        icon: SvgPicture.asset(
+                          'assets/images/settings.svg',
+                          height: 20,
+                          width: 20,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              isVisiblty ? hideBottomBarMenu() : Container(),
+              Positioned.fill(
+                bottom: 10,
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        iconSize: 30,
+                        onPressed: () {
+                          youtubeSheetBody();
+                        },
+                        color: Palette.barColor,
+                        icon: Image.asset(
+                          'assets/images/youtube_icon.png',
+                          width: 50,
+                          height: 50,
+                        ),
+                      ),
+                      IconButton(
+                        iconSize: 30,
+                        onPressed: () {
+                          if (!isShare && widget.isFromHomePage == null) {
+                            Share.share(
+                              searchBodyData?.sharurl ?? (isShowTitle == true &&
+                                  readScreen?.sharurl != null ? '${readScreen
+                                  ?.sharurl}' : '${encyclopediaBody?.sharurl}'),
+                            );
+                          }
+                          if (!isShare && widget.isFromHomePage == true) {
+                            if (readScreen?.sharurl != null) Share.share(
+                                '${readScreen?.sharurl} ');
+                          }
+                        },
+                        color: Palette.barColor,
+                        icon: Icon(Icons.share),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContent(ThemeData theme,appTheme) {
+    if (readScreen != null || encyclopediaBody != null || searchData != null) {
+      return Theme(
+        data: theme,
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          child: Stack(
+            children: [
+              Container(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
+                color: appTheme.readBookBackgroundColor ?? Color.fromRGBO(226, 225, 224, 1),
+                child: Column(
+                  children: [
+                    SizedBox(height: 20),
+                    Expanded(
+                      child:  ListView(
+                          shrinkWrap: true,
                           children: [
-                            IconButton(
-                                onPressed: (){
-                                 Navigator.of(context).pop();
-                                },
-                                icon: Icon(Icons.arrow_back_ios_new_outlined,size: 20,color: Palette.barColor,)),
-                            IconButton(
-                                onPressed: (){
-                                  // setState(() {
-                                  //   isSettings = !isSettings;
-                                  //   isBovandakMenu = false;
-                                  // });
-                                  settingsSheetBody();
-                                },
+                            Column(
+                              children: [
+                                Container(
+                                  height: 238,
+                                  width: double.infinity,
+                                  child: Stack(
+                                    children: [
+                                      Positioned.fill(
+                                        bottom: 49,
+                                        child: Align(
+                                          alignment: Alignment.center,
+                                          child: Container(
+                                            height: 94,
+                                            width: double.infinity,
+                                            color: Color.fromRGBO(164, 171, 189, 1),
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned.fill(
+                                        child: Align(
+                                          alignment: Alignment.topCenter,
+                                          child: Container(
+                                            height: 180,
+                                            width: 140,
+                                            decoration: BoxDecoration(
+                                              color: Palette.textLineOrBackGroundColor,
+                                              border: Border.all(
+                                                color: Color.fromRGBO(51, 51, 51, 1),
+                                                width: 01,
+                                              ),
+                                            ),
+                                            child: Stack(
+                                              children: [
+                                                if (encyclopediaBody?.image != null ||
+                                                    readScreen?.image != null ||
+                                                    searchData?.image != null)
+                                                  Positioned.fill(
+                                                    child: Align(
+                                                      alignment: Alignment.center,
+                                                      child: SizedBox(
+                                                        height: 164.0,
+                                                        width: 122.0,
+                                                        child: CachedNetworkImage(
+                                                          imageUrl: encyclopediaBody?.image ??
+                                                              (readScreen?.image != null
+                                                                  ? '${readScreen?.image}'
+                                                                  : '${searchData?.image}'),
+                                                          fit: BoxFit.fill,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned.fill(
+                                        child: Align(
+                                          alignment: Alignment.bottomCenter,
+                                          child: Container(
+                                            padding: EdgeInsets.only(left: 20.0, right: 20.0),
+                                            color: Palette.textLineOrBackGroundColor,
+                                            width: double.infinity,
+                                            height: 49,
+                                            child: Row(
+                                              children: [
+                                                InkWell(
+                                                  onTap: () async {
+                                                    String? share = encyclopediaBody?.sharurl ??
+                                                        (searchBodyData?.sharurl ??
+                                                            readScreen?.sharurl ??
+                                                            searchBodyData?.sharurl);
 
-                                icon: SvgPicture.asset(
-                                  'assets/images/settings.svg',
-                                  height:   20,
-                                  width: 20,
-                                ),),
-                          ],
-                        ),),
-                    ),
-                    isVisiblty ? hideBottomBarMenu() : Container(),
-                   // isSettings ? settingsShow() : Container(),
-
-                    // Positioned.fill(
-              //   child: Align(
-              //     alignment: Alignment.bottomCenter,
-              //     child: Container(
-              //       color: Palette.textLineOrBackGroundColor,
-              //       height: 77.0,
-              //       child: Row(
-              //         mainAxisAlignment: MainAxisAlignment.start,
-              //         children: [
-              //           Expanded(
-              //               child: InkWell(
-              //                 onTap: () => setState(() {
-              //                   isYoutubeActive = !isYoutubeActive;
-              //                   isSettings = false;
-              //                   isShare = false;
-              //                   isFavorite = false;
-              //                   isBovandakMenu = false;
-              //                 }),
-              //                 child: SvgPicture.asset(
-              //                   'assets/images/youtube.svg',
-              //                   color: isYoutubeActive
-              //                       ? Palette.whenTapedButton
-              //                       : null,
-              //                   fit: BoxFit.none,
-              //                 ),
-              //               )),
-              //
-              //           Expanded(
-              //               child: InkWell(
-              //                 onTap: () {
-              //                   setState(() {
-              //                     isSettings = !isSettings;
-              //                     isYoutubeActive = false;
-              //                     isShare = false;
-              //
-              //                     isFavorite = false;
-              //                     isBovandakMenu = false;
-              //                   });
-              //                 },
-              //                 child: SvgPicture.asset(
-              //                   'assets/images/settings.svg',
-              //                   color: isSettings
-              //                       ? Palette.whenTapedButton
-              //                       : null,
-              //                   fit: BoxFit.none,
-              //                 ),
-              //               )),
-              //         ],
-              //       ),
-              //     ),
-              //   ),
-              // ),
-                    Positioned.fill(
-                      bottom: 10,
-                      child:  Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            IconButton(
-                              iconSize: 30,
-                              onPressed: ()  {
-
-                                youtubeSheetBody();
-                              },
-                              color: Palette.barColor,
-                              icon:  Image.asset(
-                                'assets/images/youtube_icon.png',
-                                width: 50,
-                                height: 50,
-                              ),
-
-
-                            ),
-                            IconButton(
-                              iconSize: 30,
-                              onPressed: ()  {
-                                if (!isShare && widget.isFromHomePage == null){
-                                  Share.share(
-                                    searchBodyData?.sharurl != null
-                                        ? '${searchBodyData?.sharurl} '
-                                        : isShowTitle == true &&
-                                        readScreen?.sharurl != null
-                                        ? '${readScreen?.sharurl}'
-                                        : '${encyclopediaBody?.sharurl}',
-                                  );
-                                }
-                                if (!isShare && widget.isFromHomePage == true){
-                                  if(readScreen?.sharurl != null)  Share.share('${readScreen?.sharurl} ');
-                                }
-                              },
-                              color: Palette.barColor,
-                              icon: Icon(Icons.share),
-
-
+                                                    await Share.share(share!);
+                                                    print('dadas');
+                                                  },
+                                                  child: Row(
+                                                    children: [
+                                                      SvgPicture.asset(
+                                                        'assets/images/այքըններ.svg',
+                                                      ),
+                                                      const SizedBox(width: 6),
+                                                      const Text('Կիսվել'),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Spacer(),
+                                                InkWell(
+                                                  onTap: () => userIsSign(),
+                                                  child: Row(
+                                                    children: [
+                                                      SvgPicture.asset(
+                                                        'assets/images/վելացնել1.svg',
+                                                      ),
+                                                      const SizedBox(width: 6),
+                                                      const Text('Պահել'),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(height: 16.0),
+                                Center(
+                                  child: SizedBox(
+                                    width: 235,
+                                    child: Text(
+                                      encyclopediaBody?.title ??
+                                          (readScreen?.title ??
+                                              (searchBodyData?.title ?? '')),
+                                      style: TextStyle(
+                                        fontFamily: 'GHEAGrapalat',
+                                        fontSize: _textSize,
+                                        fontWeight: FontWeight.w700,
+                                        letterSpacing: 1,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  padding: EdgeInsets.only(left: 16.0, right: 16.0),
+                                  width: MediaQuery.of(context).size.width,
+                                  child: HtmlWidget(
+                                    listText,
+                                    onTapUrl: (url) => _openUrl(url),
+                                  ),
+                                ),
+                                if (readScreen != null &&
+                                    readScreen?.explanation != null ||
+                                    searchData != null &&
+                                        searchBodyData?.explanation != null ||
+                                    encyclopediaBody != null &&
+                                        encyclopediaBody?.explanation != null)
+                                  SizedBox(height: 20,),
+                                Container(
+                                  padding: EdgeInsets.only(top: 10, bottom: 5),
+                                  color: Colors.white,
+                                  child: Column(
+                                    children: [
+                                      const Divider(
+                                        indent: 20,
+                                        endIndent: 20,
+                                        thickness: 2,
+                                        color: Palette.main,
+                                      ),
+                                      SizedBox(height: 20),
+                                      Container(
+                                        padding: EdgeInsets.only(left: 16.0, right: 16.0),
+                                        width: MediaQuery.of(context).size.width,
+                                        child: HtmlWidget(
+                                          readScreen?.explanation ??
+                                              (searchBodyData?.explanation ??
+                                                  (encyclopediaBody?.explanation ??
+                                                      '')),
+                                        ),
+                                      ),
+                                      SizedBox(height: 20),
+                                    ],
+                                  ),
+                                )
+                              ],
                             ),
                           ],
                         ),
-                      ),)
-                ],
+                    ),
+                    SizedBox(height: 20),
+                  ],
                 ),
               ),
-            )
-
-          // bottomNavigationBar:
+            ],
+          ),
         ),
-      ),
-    )
-        : Container(
-        child: Center(
-          child: CircularProgressIndicator(color: Palette.main),
-        ));
+    );
   }
+   return Container(child: Center(child: Text('Searching'),),);
+  }
+
   TextSpan substringForLink(String readText){
     var linkText = 'այս հղմամբ ։';
     print(linkText.length);

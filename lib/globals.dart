@@ -117,11 +117,9 @@ class Api {
   static String get categoryListUrl => '$api_url/libraries/categoryList';
 
   // static libraryCategoryById(id) => '$api_url/libraries/$id';
-  static String libraryCategoryById(String id, {String? eTag}) {
+  static String libraryCategoryById(String id,) {
     var url = '$api_url/libraries/$id';
-    if (eTag != null) {
-      url += '?_etag=$eTag';
-    }
+
     return url;
   }
   //ItalianLesson API

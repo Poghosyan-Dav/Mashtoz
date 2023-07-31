@@ -51,22 +51,21 @@ class _BooksScreenState extends State<BooksScreen> {
     contentFuture = bookDataProvider.getLibraryBooksByCategory(category!.id!,false);
     super.initState();
   }
-  Future<void> _refreshData() async {
-    final List<dynamic>? newData =
-    await bookDataProvider.getLibraryBooksByCategory(category!.id!, true);
+  //Inchlue in Refresh indicator
 
-    if (mounted) {
-      setState(() {
-        contentFuture = Future<List<dynamic>?>.value(newData);
-      });
-    }
-  }
+  // Future<void> _refreshData() async {
+  //   final List<dynamic>? newData =
+  //   await bookDataProvider.getLibraryBooksByCategory(category!.id!, true);
+  //
+  //   if (mounted) {
+  //     setState(() {
+  //       contentFuture = Future<List<dynamic>?>.value(newData);
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
-    final orentation = MediaQuery.of(context).size.width;
-    print(orentation);
-
     return WillPopScope(
       onWillPop: () async {
         context
@@ -135,10 +134,7 @@ class _BooksScreenState extends State<BooksScreen> {
 
                         if (snapshot.hasData) {
                           conentList = snapshot.data ;
-                          return   conentList!.isNotEmpty? RefreshIndicator(
-                              color: Palette.main,
-                              onRefresh:_refreshData,
-                              child:  ResponsiveGridList(
+                          return   conentList!.isNotEmpty?  ResponsiveGridList(
                             horizontalGridSpacing:
                             16, // Horizontal space between grid items
 
@@ -173,7 +169,7 @@ class _BooksScreenState extends State<BooksScreen> {
                                 ),
                               );
                             }),
-                          ), ) :Center(child: Text('Բովանդակությունը բացակայում է',style: TextStyle(color: Palette.appBarTitleColor))); ;;
+                          ) : Center(child: Text('Բովանդակությունը բացակայում է',style: TextStyle(color: Palette.appBarTitleColor))); ;;
                         }
                         return  Container(
                             child: Center(
@@ -223,10 +219,12 @@ class BookCard extends StatelessWidget {
                 isFromHomaPage: isFromHomePage,
                 book: null,
                 idLib: bookId.toString(),
+                categoryID: '',
               ):BookInitalScreen(
                 book: isFromAccoungel == true? null : book,
                 category: categorys,
                 idLib: bookId.toString(),
+                categoryID: '',
               ),
             ),
           );
@@ -459,6 +457,8 @@ class BookCard extends StatelessWidget {
               ),
             ],
           ),
+
+
           // child: Stack(
           //   children: <Widget>[
           //     Positioned(

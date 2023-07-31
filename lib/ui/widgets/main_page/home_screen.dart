@@ -1,14 +1,21 @@
+import 'dart:convert';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mashtoz_flutter/config/palette.dart';
 import 'package:mashtoz_flutter/domens/data_providers/session_data_provider.dart';
 import 'package:mashtoz_flutter/tab_navigator.dart';
 import 'package:provider/provider.dart';
 
+import '../../../domens/blocs/update_home_bloc.dart';
+import '../../../domens/blocs/update_home_event.dart';
 import '../../../domens/repository/user_data_provider.dart';
 import '../../../tab_provider.dart';
 import '../notifications/notification_service.dart';
+import 'library_pages/book_page.dart';
+import 'library_pages/book_read_screen.dart';
 
  enum BottomIcons {
   home,
@@ -58,11 +65,72 @@ class HomeScreenState extends State<HomeScreen> {
       NotificationService.display(message);
     });
 
-    // FirebaseMessaging.onMessageOpenedApp.listen((message) {
-    //   // final routeFromMessage = message.data["route"];
-    //   //
-    //   // Navigator.of(context).pushNamed(routeFromMessage);
-    // });
+    FirebaseMessaging.onMessageOpenedApp.listen((message) {
+      final MyBloc bloc = BlocProvider.of<MyBloc>(context);
+
+      final routeFromMessage = message.data["route"];
+
+      if (routeFromMessage != null ) {
+        Map<String, dynamic> noteData = jsonDecode(routeFromMessage);
+        //   if (noteData.containsKey('lessons')) {
+        //   Navigator.of(context).push(MaterialPageRoute(
+        //       builder: (_) =>
+        //           ItaliaLessonShow(
+        //             idLessons:noteData['lessons'],
+        //           )));
+        // }
+        if (noteData.containsKey('libraries') &&  noteData['libraries'].toString().isNotEmpty) {
+          print('noteData libraries : ${noteData["libraries"]} : ${noteData["categoryID"]}');
+          var librariesId =     noteData["libraries"].toString();
+          var cateroyId = noteData["categoryID"].toString();
+          Navigator.of(context)
+              .push(MaterialPageRoute(builder: (_) =>
+              BookInitalScreen(
+                idLib: librariesId,
+                categoryID:cateroyId,
+              ))).then((value) {
+            bloc.add(const UpdateScreenEvent(true));
+          });
+        }
+        else if (noteData.containsKey('libraries') &&  noteData['subld'].toString().isNotEmpty != null) {
+          var subID =     noteData["subld"].toString();
+          var cateroyId = noteData["categoryID"].toString();
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (_) =>
+                  BookReadScreen(
+                    idLib: subID,
+                    categoryId: cateroyId,
+                  ))).then((value) {
+            bloc.add(const UpdateScreenEvent(true));
+          });
+        }
+        else if (noteData.containsKey('encyclopedias')) {
+          var encyclopediasId =     noteData["encyclopedias"].toString();
+          var character = noteData["character"].toString();
+          print('noteData encyclopedias : $encyclopediasId $character');
+
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (_) =>
+                  BookReadScreen(
+                    encyId: encyclopediasId,
+                    character: character,
+                  ))).then((value) {
+            bloc.add(const UpdateScreenEvent(true));
+          });
+        }
+        else if (noteData.containsKey('audiolibraries')) {
+          // Navigator.of(context).push(MaterialPageRoute(
+          //     builder: (_) => AudioLibraryDataShow(
+          //       adbId: noteData['audiolibraries'] ,
+          //       isFromNotifications: true,
+          //     )));
+        }
+        else {
+          Navigator.of(context)
+              .push(MaterialPageRoute(builder: (_) => const HomeScreen()));
+        }
+      }
+    });
 hasToken();
     super.initState();
   }

@@ -44,41 +44,58 @@ class _AudioLibraryDataShowState extends State<AudioLibraryDataShow> {
   @override
   void initState() {
     userDataProvider.fetchUserInfo().then((value) => custemerId = value?.id);
-    if (adbId != null && widget.isFromNotifications == true){
-      bookDataProvider
-          .getDialect_Encyclopaedia_Characters(Api.audioLibrariesCharacters)
-          .then((value) {
-        for (var nv in value) {
-          print("ForEach$nv");
-          bookDataProvider
-              .getDataByCharacters(Api.audioLibrariesByCharacters(nv))
-              .then((value) {
-            for (var nValue in value) {
-              print("ForEach2${nValue.id}");
-              if ("(${nValue.id})".toString().contains(adbId.toString())) {
-                dataCharacter = nValue;
-                setState(() {});
-                break;
-              }
-            }
-          });
-        }
-      });
-    }else if(adbId != null){
-      bookDataProvider
-          .getDataByCharacters(Api.audioLibrariesByCharacters(firstCharacter)).then((value){
-
-        for (var nValue in value) {
-          if ("(${nValue.id})".toString().contains(adbId.toString())) {
-            dataCharacter = nValue;
-            setState(() {});
-            break;
-          }
-        }
-      });
-    }
+    _findDataCharacterFromPushNotification();
 
     super.initState();
+  }
+  Future<void> _findDataCharacterFromPushNotification() async {
+    try {
+      if (adbId != null) {
+        if (widget.isFromNotifications == true) {
+          // Refresh data for BooksScreen and HomePage
+          bookDataProvider.updateBooksAfterPushNotification();
+          bookDataProvider.updateHomeAfterPushNotification();
+          // Get a list of characters using audioLibrariesCharacters
+          final characters = await bookDataProvider.getDialect_Encyclopaedia_Characters(Api.audioLibrariesCharacters);
+
+          // Collect futures to be awaited using Future.wait
+          final futures = <Future>[];
+
+          for (var nv in characters) {
+            futures.add(
+              // Fetch data by characters using audioLibrariesByCharacters
+                bookDataProvider.getDataByCharacters(Api.audioLibrariesByCharacters(nv))
+                    .then((value) {
+                  for (var nValue in value) {
+                    if ("(${nValue.id})".toString().contains(adbId.toString())) {
+                      dataCharacter = nValue;
+                      setState(() {});
+                      break;
+                    }
+                  }
+                })
+            );
+          }
+
+          // Wait for all the futures to complete
+          await Future.wait(futures);
+        } else {
+          // Fetch data by characters using audioLibrariesByCharacters(firstCharacter)
+          final value = await bookDataProvider.getDataByCharacters(Api.audioLibrariesByCharacters(firstCharacter));
+
+          for (var nValue in value) {
+            if ("(${nValue.id})".toString().contains(adbId.toString())) {
+              dataCharacter = nValue;
+              setState(() {});
+              break;
+            }
+          }
+        }
+      }
+    } catch (e) {
+      // Handle any potential errors here
+      print('Error: $e');
+    }
   }
 
   @override

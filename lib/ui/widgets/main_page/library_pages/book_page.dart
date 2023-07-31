@@ -18,44 +18,47 @@ import 'book_inherited_widget.dart';
 import 'book_read_screen.dart';
 
 class BookInitalScreen extends StatefulWidget {
-  const BookInitalScreen({Key? key, this.category, this.isFromHomaPage,this.book, this.idLib})
+  const BookInitalScreen({Key? key, this.category, this.isFromHomaPage,this.book,required this.idLib,required this.categoryID})
       : super(key: key);
   final BookCategory? category;
   final Content? book;
   final bool? isFromHomaPage;
-  final String? idLib;
+  final String idLib;
+  final String categoryID;
 
   @override
   State<BookInitalScreen> createState() =>
-      _BookInitalScreenState(book: book, category: category, idLib: idLib,isFromHomePage: isFromHomaPage);
+      _BookInitalScreenState(book: book, category: category, idLib: idLib,isFromHomePage: isFromHomaPage,categoryID:categoryID);
 }
 
 class _BookInitalScreenState extends State<BookInitalScreen> {
-  _BookInitalScreenState({ this.book, this.category, this.idLib,this.isFromHomePage});
+  _BookInitalScreenState({ this.book, this.category, required this.idLib,this.isFromHomePage,required this.categoryID});
   final userDataProvider = UserDataProvider();
   final bookDataProvider = BookDataProvider();
   Content? book;
   bool isShowingDialog = false;
   final bool? isFromHomePage;
-  final String? idLib;
+  final String idLib;
+  final String categoryID;
   final BookCategory? category;
   bool isValid = false;
   int? custemerId;
   @override
   void initState() {
-    userDataProvider.fetchUserInfo().then((value) => custemerId = value?.id??0);
-    if(idLib != null) findBook();
+
+    userDataProvider.fetchUserInfo().then((value) => custemerId = value?.id);
+    if(idLib.isNotEmpty && categoryID.isNotEmpty) findBookFromPushNotification();
+    if(idLib.isNotEmpty && !idLib.contains('null') ) findBook();
 
     super.initState();
   }
   void findBook()async{
+    bookDataProvider.updateHomeAfterPushNotification();
     await bookDataProvider.getCategoryLists(Api.categoryListUrl,false).then((value) {
       for (var nv in value) {
-        print("Iddddddddd${nv.id}");
-        bookDataProvider.getLibraryBooksByCategory(nv.id!,false).then((value) {
-
+        bookDataProvider.getLibraryBooksByCategory(nv.id!, false).then((value) {
           for (var nValue in value!) {
-            if ("(${nValue.id})".toString().contains(idLib!)) {
+            if (nValue.id == int.parse('$idLib')) {
               book = nValue;
               setState(() {});
               break;
@@ -64,6 +67,22 @@ class _BookInitalScreenState extends State<BookInitalScreen> {
         });
       }
     });
+
+  }
+
+  void findBookFromPushNotification(){
+    bookDataProvider.updateHomeAfterPushNotification();
+    bookDataProvider.getLibraryBooksByCategory(int.parse('$categoryID'),true).then((value) {
+
+      for (var nValue in value!) {
+        if (nValue.id == int.parse('$idLib')) {
+          book = nValue;
+          setState(() {});
+          break;
+        }
+      }
+    });
+
 
   }
 //   Future<void> getLibrarayYbooksById(int idLib) async {

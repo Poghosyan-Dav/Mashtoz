@@ -55,6 +55,7 @@ void searchPageination(int? id,String? type){
       MaterialPageRoute(
         builder: (_) => BookInitalScreen(
           idLib: id.toString(),
+          categoryID: '',
         ),
       ),
     );

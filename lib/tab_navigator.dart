@@ -27,7 +27,7 @@ class TabNavigator extends StatelessWidget {
     required this.tabItem,
   }) {
     _routes = {
-      'homepage': (context) => HomePage(),
+      'homepage': (context) => const HomePage(),
       'librarypage': (context) => const LibraryPage(),
       'searchpage': (context) => const SearchPage(),
       'italianpage': (context) => ItalianPage(),
