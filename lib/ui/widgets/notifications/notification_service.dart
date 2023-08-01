@@ -48,6 +48,7 @@ class NotificationService {
         onSelectNotification: (String? route) async {
       if (route != null && context != null) {
         final MyBloc bloc = BlocProvider.of<MyBloc>(context);
+        bloc.add(const UpdateScreenEvent(true));
         Map<String, dynamic> noteData = jsonDecode(route);
         //   if (noteData.containsKey('lessons')) {
         //   Navigator.of(context).push(MaterialPageRoute(
@@ -65,9 +66,7 @@ class NotificationService {
               BookInitalScreen(
                 idLib: librariesId,
                 categoryID:cateroyId,
-              ))).then((value) {
-            bloc.add(const UpdateScreenEvent(true));
-          });
+              )));
         }
         else if (noteData.containsKey('libraries') &&  noteData['subld'].toString().isNotEmpty != null) {
           var subID =     noteData["subld"].toString();
@@ -77,9 +76,7 @@ class NotificationService {
                   BookReadScreen(
                     idLib: subID,
                     categoryId: cateroyId,
-                  ))).then((value) {
-            bloc.add(const UpdateScreenEvent(true));
-          });;
+                  )));
         }
         else if (noteData.containsKey('encyclopedias')) {
           var encyclopediasId =     noteData["encyclopedias"].toString();
@@ -91,9 +88,7 @@ class NotificationService {
                   BookReadScreen(
                     encyId: encyclopediasId,
                     character: character,
-                  ))).then((value) {
-            bloc.add(const UpdateScreenEvent(true));
-          });;
+                  )));
         }
         else if (noteData.containsKey('audiolibraries')) {
           // Navigator.of(context).push(MaterialPageRoute(

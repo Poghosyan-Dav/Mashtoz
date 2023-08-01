@@ -54,7 +54,7 @@ class _AudioLibraryDataShowState extends State<AudioLibraryDataShow> {
         if (widget.isFromNotifications == true) {
           // Refresh data for BooksScreen and HomePage
           bookDataProvider.updateBooksAfterPushNotification();
-          bookDataProvider.updateHomeAfterPushNotification();
+          bookDataProvider.updateHomeAfterPushNotification(context);
           // Get a list of characters using audioLibrariesCharacters
           final characters = await bookDataProvider.getDialect_Encyclopaedia_Characters(Api.audioLibrariesCharacters);
 

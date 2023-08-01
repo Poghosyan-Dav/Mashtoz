@@ -53,7 +53,7 @@ class _BookInitalScreenState extends State<BookInitalScreen> {
     super.initState();
   }
   void findBook()async{
-    bookDataProvider.updateHomeAfterPushNotification();
+    bookDataProvider.updateHomeAfterPushNotification(context);
     await bookDataProvider.getCategoryLists(Api.categoryListUrl,false).then((value) {
       for (var nv in value) {
         bookDataProvider.getLibraryBooksByCategory(nv.id!, false).then((value) {
@@ -71,7 +71,7 @@ class _BookInitalScreenState extends State<BookInitalScreen> {
   }
 
   void findBookFromPushNotification(){
-    bookDataProvider.updateHomeAfterPushNotification();
+    bookDataProvider.updateHomeAfterPushNotification(context);
     bookDataProvider.getLibraryBooksByCategory(int.parse('$categoryID'),true).then((value) {
 
       for (var nValue in value!) {

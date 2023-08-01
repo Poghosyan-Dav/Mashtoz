@@ -1,9 +1,12 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 // import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
+import 'package:mashtoz_flutter/domens/blocs/update_home_event.dart';
 import 'package:mashtoz_flutter/domens/data_providers/session_data_provider.dart';
 import 'package:mashtoz_flutter/domens/models/book_data/book_home_data.dart';
 import 'package:mashtoz_flutter/domens/models/book_data/category_lsit.dart';
@@ -12,6 +15,7 @@ import 'package:mashtoz_flutter/domens/models/book_data/lessons.dart';
 import 'package:mashtoz_flutter/domens/models/book_data/word_of_day.dart';
 
 import '../../globals.dart';
+import '../blocs/update_home_bloc.dart';
 import '../models/book_data/content_list.dart';
 import '../models/book_data/data.dart';
 
@@ -710,7 +714,9 @@ class BookDataProvider {
   }
 
 
-  Future<void> updateHomeAfterPushNotification() async {
+  Future<void> updateHomeAfterPushNotification(BuildContext context) async {
+    final MyBloc bloc = BlocProvider.of<MyBloc>(context);
+
     try {
       // Fetch the home data using await to make the code cleaner and more readable
       final value = await getHomeData(true);
@@ -720,7 +726,13 @@ class BookDataProvider {
         getDataByCharactersForHome(Api.encyclopediasByCharacters(value.encyclopedias?.first)),
         getDataByCharactersForHome(Api.dialectBYCharacters(value.dialects?.first)),
         getDataByCharactersForHome(Api.audioLibrariesByCharacters(value.audiolibraries)),
-      ]);
+      ]).catchError((error){
+        bloc.add(const UpdateScreenEvent(false));
+        print('Error occurred during API call: $error');
+      });
+
+
+      bloc.add(const UpdateScreenEvent(false));
 
       // Any additional code that needs to be executed after the three tasks
       // (if necessary) can be added here.

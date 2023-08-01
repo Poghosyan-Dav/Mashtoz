@@ -112,7 +112,7 @@ class _BookReadScreenState extends State<BookReadScreen> {
    if(encyId != null ) findEncyBookFromPushNotification();
     _pageController;
     futureSearchText = getSearchBook();
-
+    textList = readScreen?.body ?? encyclopediaBody?.body;
     super.initState();
   }
 
@@ -132,7 +132,7 @@ class _BookReadScreenState extends State<BookReadScreen> {
       }
 
       // Call the updated method using await to ensure it's executed after the previous loop
-      await bookDataProvider.updateHomeAfterPushNotification();
+      await bookDataProvider.updateHomeAfterPushNotification(context);
     } catch (e) {
       // Handle any potential errors here
       print('Error: $e');
@@ -142,7 +142,7 @@ class _BookReadScreenState extends State<BookReadScreen> {
   void findBookFromPushNotification() async {
     bool found = false;
     await Future.wait([
-      bookDataProvider.updateHomeAfterPushNotification(),
+      bookDataProvider.updateHomeAfterPushNotification(context),
       if (categoryId == null)
         bookDataProvider.getCategoryLists(Api.categoryListUrl, false),
     ]);
