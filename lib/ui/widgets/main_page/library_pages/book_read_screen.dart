@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:html/parser.dart' show parse;
 import 'package:mashtoz_flutter/config/palette.dart';
 import 'package:mashtoz_flutter/domens/models/app_theme.dart/theme_notifire.dart';
 import 'package:mashtoz_flutter/domens/models/book_data/data.dart';
@@ -1138,28 +1139,18 @@ class _BookPagesState extends State<BookPages> {
                     .height,
                 color: appTheme.readBookBackgroundColor ??
                     Color.fromRGBO(226, 225, 224, 1),
-                child: Column(
-                  children: [
-                    SizedBox(height: 20),
-                    Expanded(
-                      child: RawScrollbar(
+                child:RawScrollbar(
                         thumbColor: Palette.whenTapedButton,
                         thickness: 5,
                         crossAxisMargin: 5,
                         radius: const Radius.circular(12),
                         thumbVisibility: true,
-                        child: ListView(
-                          shrinkWrap: true,
-                          children: [
-                            _buildContent(theme,appTheme),
-                            SizedBox(height: 20),
-                          ],
+                        child:  _buildContent(theme,appTheme),
+
+
                         ),
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                  ],
-                ),
+
+
               ),
               Positioned.fill(
                 right: 20,
@@ -1246,201 +1237,190 @@ class _BookPagesState extends State<BookPages> {
         child: Container(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
-          child: Stack(
-            children: [
-              Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                color: appTheme.readBookBackgroundColor ?? Color.fromRGBO(226, 225, 224, 1),
-                child: Column(
-                  children: [
-                    SizedBox(height: 20),
-                    Expanded(
-                      child:  ListView(
-                          shrinkWrap: true,
-                          children: [
-                            Column(
-                              children: [
-                                Container(
-                                  height: 238,
-                                  width: double.infinity,
-                                  child: Stack(
-                                    children: [
-                                      Positioned.fill(
-                                        bottom: 49,
-                                        child: Align(
-                                          alignment: Alignment.center,
-                                          child: Container(
-                                            height: 94,
-                                            width: double.infinity,
-                                            color: Color.fromRGBO(164, 171, 189, 1),
-                                          ),
-                                        ),
-                                      ),
-                                      Positioned.fill(
-                                        child: Align(
-                                          alignment: Alignment.topCenter,
-                                          child: Container(
-                                            height: 180,
-                                            width: 140,
-                                            decoration: BoxDecoration(
-                                              color: Palette.textLineOrBackGroundColor,
-                                              border: Border.all(
-                                                color: Color.fromRGBO(51, 51, 51, 1),
-                                                width: 01,
-                                              ),
-                                            ),
-                                            child: Stack(
-                                              children: [
-                                                if (encyclopediaBody?.image != null ||
-                                                    readScreen?.image != null ||
-                                                    searchData?.image != null)
-                                                  Positioned.fill(
-                                                    child: Align(
-                                                      alignment: Alignment.center,
-                                                      child: SizedBox(
-                                                        height: 164.0,
-                                                        width: 122.0,
-                                                        child: CachedNetworkImage(
-                                                          imageUrl: encyclopediaBody?.image ??
-                                                              (readScreen?.image != null
-                                                                  ? '${readScreen?.image}'
-                                                                  : '${searchData?.image}'),
-                                                          fit: BoxFit.fill,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Positioned.fill(
-                                        child: Align(
-                                          alignment: Alignment.bottomCenter,
-                                          child: Container(
-                                            padding: EdgeInsets.only(left: 20.0, right: 20.0),
-                                            color: Palette.textLineOrBackGroundColor,
-                                            width: double.infinity,
-                                            height: 49,
-                                            child: Row(
-                                              children: [
-                                                InkWell(
-                                                  onTap: () async {
-                                                    String? share = encyclopediaBody?.sharurl ??
-                                                        (searchBodyData?.sharurl ??
-                                                            readScreen?.sharurl ??
-                                                            searchBodyData?.sharurl);
+            color: appTheme.readBookBackgroundColor ?? Color.fromRGBO(226, 225, 224, 1),
+            child: ListView(
+                    shrinkWrap: true,
+                    children: [
 
-                                                    await Share.share(share!);
-                                                    print('dadas');
-                                                  },
-                                                  child: Row(
-                                                    children: [
-                                                      SvgPicture.asset(
-                                                        'assets/images/այքըններ.svg',
-                                                      ),
-                                                      const SizedBox(width: 6),
-                                                      const Text('Կիսվել'),
-                                                    ],
-                                                  ),
-                                                ),
-                                                Spacer(),
-                                                InkWell(
-                                                  onTap: () => userIsSign(),
-                                                  child: Row(
-                                                    children: [
-                                                      SvgPicture.asset(
-                                                        'assets/images/վելացնել1.svg',
-                                                      ),
-                                                      const SizedBox(width: 6),
-                                                      const Text('Պահել'),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(height: 16.0),
-                                Center(
-                                  child: SizedBox(
-                                    width: 235,
-                                    child: Text(
-                                      encyclopediaBody?.title ??
-                                          (readScreen?.title ??
-                                              (searchBodyData?.title ?? '')),
-                                      style: TextStyle(
-                                        fontFamily: 'GHEAGrapalat',
-                                        fontSize: _textSize,
-                                        fontWeight: FontWeight.w700,
-                                        letterSpacing: 1,
-                                      ),
-                                      textAlign: TextAlign.center,
+                          Container(
+                            height: 238,
+                            width: double.infinity,
+                            child: Stack(
+                              children: [
+                                Positioned.fill(
+                                  bottom: 49,
+                                  child: Align(
+                                    alignment: Alignment.center,
+                                    child: Container(
+                                      height: 94,
+                                      width: double.infinity,
+                                      color: Color.fromRGBO(164, 171, 189, 1),
                                     ),
                                   ),
                                 ),
-                                Container(
-                                  padding: EdgeInsets.only(left: 16.0, right: 16.0),
-                                  width: MediaQuery.of(context).size.width,
-                                  child: HtmlWidget(
-                                    listText,
-                                    onTapUrl: (url) => _openUrl(url),
-                                  ),
-                                ),
-                                if (readScreen != null &&
-                                    readScreen?.explanation != null ||
-                                    searchData != null &&
-                                        searchBodyData?.explanation != null ||
-                                    encyclopediaBody != null &&
-                                        encyclopediaBody?.explanation != null)
-                                  SizedBox(height: 20,),
-                                Container(
-                                  padding: EdgeInsets.only(top: 10, bottom: 5),
-                                  color: Colors.white,
-                                  child: Column(
-                                    children: [
-                                      const Divider(
-                                        indent: 20,
-                                        endIndent: 20,
-                                        thickness: 2,
-                                        color: Palette.main,
-                                      ),
-                                      SizedBox(height: 20),
-                                      Container(
-                                        padding: EdgeInsets.only(left: 16.0, right: 16.0),
-                                        width: MediaQuery.of(context).size.width,
-                                        child: HtmlWidget(
-                                          readScreen?.explanation ??
-                                              (searchBodyData?.explanation ??
-                                                  (encyclopediaBody?.explanation ??
-                                                      '')),
+                                Positioned.fill(
+                                  child: Align(
+                                    alignment: Alignment.topCenter,
+                                    child: Container(
+                                      height: 180,
+                                      width: 140,
+                                      decoration: BoxDecoration(
+                                        color: Palette.textLineOrBackGroundColor,
+                                        border: Border.all(
+                                          color: Color.fromRGBO(51, 51, 51, 1),
+                                          width: 01,
                                         ),
                                       ),
-                                      SizedBox(height: 20),
-                                    ],
+                                      child: Stack(
+                                        children: [
+                                          if (encyclopediaBody?.image != null ||
+                                              readScreen?.image != null ||
+                                              searchData?.image != null)
+                                            Positioned.fill(
+                                              child: Align(
+                                                alignment: Alignment.center,
+                                                child: SizedBox(
+                                                  height: 164.0,
+                                                  width: 122.0,
+                                                  child: CachedNetworkImage(
+                                                    imageUrl: encyclopediaBody?.image ??
+                                                        (readScreen?.image != null
+                                                            ? '${readScreen?.image}'
+                                                            : '${searchData?.image}'),
+                                                    fit: BoxFit.fill,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                    ),
                                   ),
-                                )
+                                ),
+                                Positioned.fill(
+                                  child: Align(
+                                    alignment: Alignment.bottomCenter,
+                                    child: Container(
+                                      padding: EdgeInsets.only(left: 20.0, right: 20.0),
+                                      color: Palette.textLineOrBackGroundColor,
+                                      width: double.infinity,
+                                      height: 49,
+                                      child: Row(
+                                        children: [
+                                          InkWell(
+                                            onTap: () async {
+                                              String? share = encyclopediaBody?.sharurl ??
+                                                  (searchBodyData?.sharurl ??
+                                                      readScreen?.sharurl ??
+                                                      searchBodyData?.sharurl);
+
+                                              await Share.share(share!);
+                                              print('dadas');
+                                            },
+                                            child: Row(
+                                              children: [
+                                                SvgPicture.asset(
+                                                  'assets/images/այքըններ.svg',
+                                                ),
+                                                const SizedBox(width: 6),
+                                                const Text('Կիսվել'),
+                                              ],
+                                            ),
+                                          ),
+                                          Spacer(),
+                                          InkWell(
+                                            onTap: () => userIsSign(),
+                                            child: Row(
+                                              children: [
+                                                SvgPicture.asset(
+                                                  'assets/images/վելացնել1.svg',
+                                                ),
+                                                const SizedBox(width: 6),
+                                                const Text('Պահել'),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
-                          ],
-                        ),
-                    ),
-                    SizedBox(height: 20),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
+                          ),
+                          SizedBox(height: 16.0),
+                          Center(
+                            child: SizedBox(
+                              width: 235,
+                              child: Text(
+                                encyclopediaBody?.title ??
+                                    (readScreen?.title ??
+                                        (searchBodyData?.title ?? '')),
+                                style: TextStyle(
+                                  fontFamily: 'GHEAGrapalat',
+                                  fontSize: _textSize,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 1,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(left: 16.0, right: 16.0),
+                            width: MediaQuery.of(context).size.width,
+                            child: HtmlWidget(
+                           listText,
+                              onTapUrl: (url) => _openUrl(url),
+                            ),
+                          ),
+                          if (readScreen != null &&
+                              readScreen?.explanation != null ||
+                              searchData != null &&
+                                  searchBodyData?.explanation != null ||
+                              encyclopediaBody != null &&
+                                  encyclopediaBody?.explanation != null)
+                            SizedBox(height: 20,),
+                           Container(
+                              padding: EdgeInsets.only(top: 10, bottom: 5),
+                              color: Colors.white,
+                              child: Column(
+                                children: [
+                                  const Divider(
+                                    indent: 20,
+                                    endIndent: 20,
+                                    thickness: 2,
+                                    color: Palette.main,
+                                  ),
+                                  SizedBox(height: 20),
+                                  Container(
+                                    padding: EdgeInsets.only(left: 16.0, right: 16.0),
+                                    width: MediaQuery.of(context).size.width,
+                                    child: HtmlWidget(
+                                        readScreen?.explanation ??
+                                          (searchBodyData?.explanation ??
+                                              (encyclopediaBody?.explanation ??
+                                                  '')),
+
+                                    ),
+                                  ),
+
+                                ],
+                              ),
+                          ),
+                      const  SizedBox(height: 20,),
+                    ],
+                  ),
+            ),
+
     );
   }
    return Container(child: Center(child: Text('Searching'),),);
+  }
+  String parseHtmlToText(String htmlString) {
+    final document = parse(htmlString);
+    final String parsedString = parse(document.body!.text).documentElement!.text;
+    return parsedString;
   }
 
   TextSpan substringForLink(String readText){

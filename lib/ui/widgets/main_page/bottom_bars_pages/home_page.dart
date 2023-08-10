@@ -89,7 +89,7 @@ class _HomePageState extends State<HomePage> {
       if(value!=null)_users= value;
     });
    //wordsOfDayFuture = _bookDataProvider.getWordsOfDay();
-  _fetchHomeData(false);
+  _fetchHomeData(true);
     _scrollController.addListener(() {
       if (_scrollController.position.userScrollDirection ==
           ScrollDirection.reverse) {
@@ -189,15 +189,13 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final MyBloc bloc = BlocProvider.of<MyBloc>(context);
 
     SizeConfig().init(context);
-    // context.watch<UserLogOutNotifier>().saveUserName();
 
     return  ConnectivityBuilder(
         builder:(context,isConnect,status){
           if(isConnect==true){
-            if (libraries != null) {
+            if (libraries != null ) {
               return SafeArea(
                 child: Theme(
                   data: ThemeData(

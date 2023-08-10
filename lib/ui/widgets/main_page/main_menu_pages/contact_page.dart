@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:mashtoz_flutter/domens/repository/user_data_provider.dart';
 
 import '../../../../config/palette.dart';
-import '../../../../main.dart';
 import '../../helper_widgets/menuShow.dart';
 
 class Contact extends StatefulWidget {
@@ -242,22 +240,7 @@ class _ContactState extends State<Contact> {
       },
     );
   }
-    Future<void> _showNotification() async {
-      const AndroidNotificationDetails androidNotificationDetails =
-      AndroidNotificationDetails('your channel id', 'your channel name',
-          channelDescription: 'your channel description',
-          importance: Importance.max,
-          priority: Priority.high,
-          ticker: 'ticker');
-      const NotificationDetails notificationDetails =
-      NotificationDetails(android: androidNotificationDetails);
-      await flutterLocalNotificationsPlugin.show(
-          1, 'plain title', 'plain body', notificationDetails,
-        payload: '{"libraries":"111"}',
-       // payload: '{"encyclopedias":"19"}',
-          // payload: '{"audiolibraries":"8"}',
-      );
-    }
+
     /*
     'libraries',
     'encyclopedias',

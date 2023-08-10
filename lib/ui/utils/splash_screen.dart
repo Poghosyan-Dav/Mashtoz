@@ -34,7 +34,7 @@ class _MySplashScreenState extends State<MySplashScreen> {
     if (isActive == true){
       await Future.delayed(Duration(milliseconds: 5000));
       Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => HomeScreen()),
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
               (Route<dynamic> route) => false);
     }
 

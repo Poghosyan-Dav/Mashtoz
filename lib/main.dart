@@ -46,18 +46,11 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
- //  await Hive.initFlutter();
- // Hive.registerAdapter(ContentAdapter());
- // Hive.registerAdapter(DataAdapter());
- // Hive.registerAdapter(HomeDataAdapter());
- // Hive.registerAdapter(LessonsAdapter());
-
 
  Platform.isIOS ? isWhichPlatform = true : isWhichPlatform;
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   await flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
@@ -69,15 +62,11 @@ void main() async {
     badge: true,
     sound: true,
   );
- // await Future.wait([
- //   Hive.openBox('data'),
- //   Hive.openBox('UserData'),
- //   Hive.openBox('category'),
- // ]);
  await initializeDateFormatting();
 
   runApp(const MyApp());
   CacheManager.logLevel = CacheManagerLogLevel.verbose;
+
 }
 
 class MyApp extends StatefulWidget {
@@ -89,7 +78,8 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   Locale? _locale;
-  FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+  FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   String? _deviceId;
   final _userDataProvider = UserDataProvider();
   Future<void> initPlatformState() async {
@@ -119,7 +109,7 @@ class _MyAppState extends State<MyApp> {
   }
   void getToken() async {
 
-    String? token = await messaging.getToken();
+    String? token = await _firebaseMessaging.getToken();
 
     if (token != null && _deviceId != null) {
       var data = {'device_id': _deviceId, 'fcm_token': token};
@@ -127,7 +117,7 @@ class _MyAppState extends State<MyApp> {
       _userDataProvider.postFCMToken(data);
     }
 
-    messaging.onTokenRefresh.listen((newToken) {
+    _firebaseMessaging.onTokenRefresh.listen((newToken) {
       if (newToken != null && _deviceId != null) {
         var data = {'device_id': _deviceId, 'fcm_token': token};
         print("device_id : ${data['device_id']} &\nfcm_token: ${data['fcm_token']}");

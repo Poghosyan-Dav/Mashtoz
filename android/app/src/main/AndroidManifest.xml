@@ -71,10 +71,14 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+       <meta-data
+           android:name="com.google.firebase.messaging.default_notification_channel_id"
+           android:value="default_notification_channel_id" />
        <service
            android:name="com.dexterous.flutterlocalnotifications.ForegroundService"
            android:exported="false"
            android:stopWithTask="false"/>
+
     </application>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,14 +13,41 @@ import 'package:timezone/data/latest.dart' as tz;
 
 import '../../../domens/blocs/update_home_bloc.dart';
 import '../../../domens/blocs/update_home_event.dart';
+import '../../../firebase_options.dart';
 
 final BehaviorSubject<String?> selectNotificationSubject =
     BehaviorSubject<String?>();
 
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message,) async {
   print(' --- background message received ---');
   print(message.notification!.title);
-  print(message.notification!.body);
+  print('im here fuck');
+  // Setting the context
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  // const InitializationSettings initializationSettings =
+  // InitializationSettings(
+  //     android: AndroidInitializationSettings("@mipmap/ic_launcher_foreground"));
+  // final notification = FlutterLocalNotificationsPlugin();
+  // await notification.show(
+  //   0,
+  //   message.notification!.title ?? 'Notification',
+  //   message.notification!.body ?? '',
+  //   const NotificationDetails(
+  //     android: AndroidNotificationDetails(
+  //       'mashtoz',
+  //       'mashtoz',
+  //
+  //       priority: Priority.high,
+  //       importance: Importance.max,
+  //     ),
+  //   ),
+  //   payload: message.data['route'], // Example payload
+  // );
+// Accessing the context
+
 }
 
 class NotificationService {
@@ -118,7 +146,7 @@ class NotificationService {
           android: AndroidNotificationDetails(
         'mashtoz',
         'mashtoz',
-        icon:'@mipmap/ic_launcher',
+        icon:'@mipmap/ic_launcher_foreground',
         channelDescription: 'this is our channel',
         importance: Importance.high,
         priority: Priority.high,
@@ -137,13 +165,4 @@ class NotificationService {
   }
 }
 
-class SecondScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: Center(
-        child: Text('data'),
-      ),
-    );
-  }
-}
+

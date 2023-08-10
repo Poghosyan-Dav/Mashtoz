@@ -44,9 +44,84 @@ class HomeScreenState extends State<HomeScreen> {
   final _sessionProvider=SessionDataProvider();
   final userDataProvider = UserDataProvider();
   bool  isLogin = false;
+  Future<void> setupInteractedMessage() async {
+    // Get any messages which caused the application to open from a terminated state.
+    RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+
+    // If the message also contains a data property with a "type" of "chat", navigate to a chat screen
+    if (initialMessage != null) {
+      _handleMessage(initialMessage);
+    }
+
+    // Also handle any interaction when the app is in the background via a Stream listener
+    FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
+  }
+  Future<void> _handleMessage(RemoteMessage message)  async {
+    await onHandlePushNotification(context: context, message: message);
+
+  }
+  Future<void> onHandlePushNotification({required BuildContext context, required RemoteMessage message}) async {
+
+    if (message.data['route'] != null && context != null) {
+      final MyBloc bloc = BlocProvider.of<MyBloc>(context);
+      bloc.add(const UpdateScreenEvent(true));
+      Map<String, dynamic> noteData = jsonDecode(message.data['route']);
+      //   if (noteData.containsKey('lessons')) {
+      //   Navigator.of(context).push(MaterialPageRoute(
+      //       builder: (_) =>
+      //           ItaliaLessonShow(
+      //             idLessons:noteData['lessons'],
+      //           )));
+      // }
+      if (noteData.containsKey('libraries') &&  noteData['libraries'].toString().isNotEmpty) {
+        print('noteData libraries : ${noteData["libraries"]} : ${noteData["categoryID"]}');
+        var librariesId =     noteData["libraries"].toString();
+        var cateroyId = noteData["categoryID"].toString();
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (_) =>
+            BookInitalScreen(
+              idLib: librariesId,
+              categoryID:cateroyId,
+            )));
+      }
+      else if (noteData.containsKey('libraries') &&  noteData['subld'].toString().isNotEmpty != null) {
+        var subID =     noteData["subld"].toString();
+        var cateroyId = noteData["categoryID"].toString();
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (_) =>
+                BookReadScreen(
+                  idLib: subID,
+                  categoryId: cateroyId,
+                )));
+      }
+      else if (noteData.containsKey('encyclopedias')) {
+        var encyclopediasId =     noteData["encyclopedias"].toString();
+        var character = noteData["character"].toString();
+        print('noteData encyclopedias : $encyclopediasId $character');
+
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (_) =>
+                BookReadScreen(
+                  encyId: encyclopediasId,
+                  character: character,
+                )));
+      }
+      else if (noteData.containsKey('audiolibraries')) {
+        // Navigator.of(context).push(MaterialPageRoute(
+        //     builder: (_) => AudioLibraryDataShow(
+        //       adbId: noteData['audiolibraries'] ,
+        //       isFromNotifications: true,
+        //     )));
+      }
+      else {
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (_) => const HomeScreen()));
+      }
+    }
+  }
   @override
   void initState() {
-
+    setupInteractedMessage();
     NotificationService.initialize(context);
 
     FirebaseMessaging.instance.getInitialMessage().then((message) {
@@ -71,6 +146,8 @@ class HomeScreenState extends State<HomeScreen> {
       final routeFromMessage = message.data["route"];
 
       if (routeFromMessage != null ) {
+        bloc.add(const UpdateScreenEvent(true));
+
         Map<String, dynamic> noteData = jsonDecode(routeFromMessage);
         //   if (noteData.containsKey('lessons')) {
         //   Navigator.of(context).push(MaterialPageRoute(
@@ -88,9 +165,7 @@ class HomeScreenState extends State<HomeScreen> {
               BookInitalScreen(
                 idLib: librariesId,
                 categoryID:cateroyId,
-              ))).then((value) {
-            bloc.add(const UpdateScreenEvent(true));
-          });
+              )));
         }
         else if (noteData.containsKey('libraries') &&  noteData['subld'].toString().isNotEmpty != null) {
           var subID =     noteData["subld"].toString();
@@ -100,9 +175,7 @@ class HomeScreenState extends State<HomeScreen> {
                   BookReadScreen(
                     idLib: subID,
                     categoryId: cateroyId,
-                  ))).then((value) {
-            bloc.add(const UpdateScreenEvent(true));
-          });
+                  )));
         }
         else if (noteData.containsKey('encyclopedias')) {
           var encyclopediasId =     noteData["encyclopedias"].toString();
@@ -114,9 +187,7 @@ class HomeScreenState extends State<HomeScreen> {
                   BookReadScreen(
                     encyId: encyclopediasId,
                     character: character,
-                  ))).then((value) {
-            bloc.add(const UpdateScreenEvent(true));
-          });
+                  )));
         }
         else if (noteData.containsKey('audiolibraries')) {
           // Navigator.of(context).push(MaterialPageRoute(

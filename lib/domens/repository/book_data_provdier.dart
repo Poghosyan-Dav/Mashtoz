@@ -654,14 +654,15 @@ class BookDataProvider {
 
             updateHomeData = data;
 
-            if (!mapEquals(updateHomeData, homeData)) {
+            homeData = updateHomeData;
+
               // Cache the response
               await cacheManager.putFile(
                 Api.getHomeData,
                 response.bodyBytes,
               );
-              homeData = updateHomeData;
-            }
+
+
           } else {
             // Handle error case
             var error = responseBody['error'] ?? 'Unknown error';
@@ -687,7 +688,7 @@ class BookDataProvider {
         var data = body['data'] as Map<String, dynamic>;
         updateHomeData = data;
 
-        if (!mapEquals(updateHomeData, homeData)) {
+        homeData = updateHomeData;
           // Cache the response
           await cacheManager.putFile(
             Api.getHomeData,
@@ -697,8 +698,8 @@ class BookDataProvider {
             maxAge: Duration(seconds: 10),
             // Set the maximum cache size (in bytes)
           );
-          homeData = updateHomeData;
-        }
+
+
       } else {
         // Handle error case
         var error = body['error'] ?? 'Unknown error';
@@ -885,3 +886,27 @@ String responses = """{
           ]
         }
       }""";
+
+bool deepEquals(dynamic object1, dynamic object2) {
+  if (object1 == object2) return true;
+
+  if (object1 is Map && object2 is Map) {
+    if (object1.length != object2.length) return false;
+    for (var key in object1.keys) {
+      if (!object2.containsKey(key) || !deepEquals(object1[key], object2[key])) {
+        return false;
+      }
+    }
+    return true;
+  } else if (object1 is List && object2 is List) {
+    if (object1.length != object2.length) return false;
+    for (var i = 0; i < object1.length; i++) {
+      if (!deepEquals(object1[i], object2[i])) {
+        return false;
+      }
+    }
+    return true;
+  } else {
+    return object1 == object2;
+  }
+}

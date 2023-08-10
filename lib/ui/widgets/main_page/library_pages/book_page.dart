@@ -355,7 +355,7 @@ class _BookInitalScreenState extends State<BookInitalScreen> {
                           ?.values
                           .map((e) => e)
                           .toList();
-                      if (bovandak?[index].content != null) {
+                      if (bovandak?[index].content != null && subBovandak?.length != 0) {
                         return Column(
                           children: [
                             ExpansionTile(
@@ -382,7 +382,6 @@ class _BookInitalScreenState extends State<BookInitalScreen> {
                                   ),
                             ),
                           );
-                          print('Coco');
 
                       },
                                 child: Text(
@@ -417,7 +416,7 @@ class _BookInitalScreenState extends State<BookInitalScreen> {
                                           )
                                           .toList();
                                       return subBovandak?[index2].content !=
-                                              null
+                                              null && subContent?.length != 0
                                           ? Column(
                                               children: [
                                                 ExpansionTile(
