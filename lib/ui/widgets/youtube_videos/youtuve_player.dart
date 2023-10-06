@@ -69,8 +69,8 @@ class _YoutubePlayersState extends State<YoutubePlayers> {
         hideControls: false,
         mute: false,
         loop: true,
-         hideThumbnail: true,
-        controlsVisibleAtStart:true,
+        hideThumbnail: true,
+        controlsVisibleAtStart: true,
         forceHD: true,
       ),
     )..addListener(listener);
@@ -181,17 +181,16 @@ class _VideoPlayerBothWidgetState extends State<VideoPlayerBothWidget> {
           return Stack(
             fit: isPortrait ? StackFit.passthrough : StackFit.expand,
             children: <Widget>[
-               Positioned.fill(
-                      child: Align(
-                      alignment: Alignment.topLeft,
-                      child: IconButton(
-                          color: Colors.white,
-                          onPressed: () {
-                            Navigator.pop(context, false);
-                          },
-                          icon: Icon(Icons.arrow_back_ios_new_outlined)),
-                    )),
-
+              Positioned.fill(
+                  child: Align(
+                alignment: Alignment.topLeft,
+                child: IconButton(
+                    color: Colors.white,
+                    onPressed: () {
+                      Navigator.pop(context, false);
+                    },
+                    icon: Icon(Icons.arrow_back_ios_new_outlined)),
+              )),
               isPortrait
                   ? Center(
                       child: Container(

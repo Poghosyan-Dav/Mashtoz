@@ -12,9 +12,9 @@ class SignupScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LoadingOverlay(
-        isLoading:context.watch<UserLogOutNotifier>().userLogOut,
-    opacity: 0.1,
-    progressIndicator: CircularProgressIndicator(),
+      isLoading: context.watch<UserLogOutNotifier>().userLogOut,
+      opacity: 0.1,
+      progressIndicator: CircularProgressIndicator(),
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: const Color.fromRGBO(
@@ -27,15 +27,15 @@ class SignupScreen extends StatelessWidget {
           child: GestureDetector(
             onTap: () => FocusScope.of(context).unfocus(),
             child: SingleChildScrollView(
-              physics:const AlwaysScrollableScrollPhysics(),
+              physics: const AlwaysScrollableScrollPhysics(),
               child: Container(
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height,
                 child: Stack(
                   children: [
                     Padding(
-                      padding:
-                          const EdgeInsets.only(right: 20.0, top: 39, left: 20.0),
+                      padding: const EdgeInsets.only(
+                          right: 20.0, top: 39, left: 20.0),
                       child: Column(
                         children: [
                           Row(
@@ -74,8 +74,8 @@ class SignupScreen extends StatelessWidget {
                                           fontFamily: 'GHEAGrapalat',
                                           letterSpacing: 1,
                                           fontWeight: FontWeight.w400,
-                                          color:
-                                              Palette.textLineOrBackGroundColor),
+                                          color: Palette
+                                              .textLineOrBackGroundColor),
                                     ),
                                   ),
                                 ),

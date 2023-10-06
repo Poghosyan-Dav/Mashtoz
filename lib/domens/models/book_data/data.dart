@@ -1,18 +1,17 @@
 class Data {
-  Data({
-    this.id,
-    this.image,
-    this.title,
-    this.body,
-    this.type,
-    this.explanation,
-    this.firstCharacter,
-    this.link,
-    this.summary,
-    this.video_link,
-    this.sharurl,
-    this.author
-  });
+  Data(
+      {this.id,
+      this.image,
+      this.title,
+      this.body,
+      this.type,
+      this.explanation,
+      this.firstCharacter,
+      this.link,
+      this.summary,
+      this.video_link,
+      this.sharurl,
+      this.author});
 
   final int? id;
   final String? image;
@@ -31,9 +30,8 @@ class Data {
         image: json["image"] == null ? null : json["image"],
         title: json["title"] == null ? null : json["title"],
         type: json["type"] == null ? null : json["type"],
-    author: json["author"] == null ? null : json["author"],
-
-    body: json["body"] == null ? null : json["body"],
+        author: json["author"] == null ? null : json["author"],
+        body: json["body"] == null ? null : json["body"],
         summary: json["summary"] == null ? null : json["summary"],
         link: json["link"] == null ? null : json["link"],
         firstCharacter:

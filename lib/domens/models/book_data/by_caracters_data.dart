@@ -1,7 +1,3 @@
-
-
-
-
 // class ByCharacters {
 //     ByCharacters({
 //         required this.id,
@@ -23,10 +19,6 @@
 //     final String firstCharacter;
 //     final String explanation;
 
-    
-
-    
-
 //     factory ByCharacters.fromJSon(Map<String, dynamic> json) => ByCharacters(
 //         id: json["id"] == null ? null : json["id"],
 //         image: json["image"] == null ? null : json["image"],
@@ -38,5 +30,4 @@
 //         explanation: json["explanation"] == null ? null : json["explanation"],
 //     );
 
-    
 // }

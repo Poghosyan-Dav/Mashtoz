@@ -54,7 +54,7 @@ class RegisterCubit extends Cubit<RegisterState> {
   Future<void> signUpCredentials() async {
     emit(state.copyWith(status: FormzStatus.submissionInProgress));
     try {
-      var  isSuccess = await _userDataProvider.signUp(
+      var isSuccess = await _userDataProvider.signUp(
         email: state.email.value,
         password: state.password.value,
         fullName: state.fullName.value,
@@ -63,14 +63,16 @@ class RegisterCubit extends Cubit<RegisterState> {
       if (isSuccess['success']) {
         emit(state.copyWith(status: FormzStatus.submissionSuccess));
       } else {
-
-        emit(state.copyWith(status: FormzStatus.submissionFailure,errorMessage:isSuccess['errors'] ));
+        emit(state.copyWith(
+            status: FormzStatus.submissionFailure,
+            errorMessage: isSuccess['errors']));
       }
     } catch (e) {
       emit(state.copyWith(status: FormzStatus.submissionFailure));
     }
   }
-  void logOut(){
+
+  void logOut() {
     emit(state.copyWith(status: FormzStatus.pure));
   }
 }

@@ -7,13 +7,13 @@ import 'package:mashtoz_flutter/ui/widgets/buttons/facebook_gmail_buttons.dart';
 import 'login_form.dart';
 
 class LoginScreen extends StatelessWidget {
-    const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     print(MediaQuery.of(context).size.height);
     return WillPopScope(
-      onWillPop: ()async{
+      onWillPop: () async {
         // switch(HomeScreenState.currentIndex){
         //   case 0 : context.read<BottomColorNotifire>().setColor(
         //       Palette.textLineOrBackGroundColor);
@@ -75,13 +75,11 @@ class LoginScreen extends StatelessWidget {
         return true;
       },
       child: LoadingOverlay(
-          isLoading:context.watch<UserLogOutNotifier>().userLogOut,
-      opacity: 0.0,
-      progressIndicator: CircularProgressIndicator(),
-
+        isLoading: context.watch<UserLogOutNotifier>().userLogOut,
+        opacity: 0.0,
+        progressIndicator: CircularProgressIndicator(),
         child: Scaffold(
           resizeToAvoidBottomInset: false,
-
           backgroundColor: const Color.fromRGBO(
             83,
             66,
@@ -101,10 +99,11 @@ class LoginScreen extends StatelessWidget {
                       Column(
                         children: [
                           Padding(
-                            padding: const EdgeInsets.only(right: 20.0, left: 20.0),
+                            padding:
+                                const EdgeInsets.only(right: 20.0, left: 20.0),
                             child: Column(
-                              children:  [
-                                const  SizedBox(height: 30),
+                              children: [
+                                const SizedBox(height: 30),
                                 const Center(
                                   child: SizedBox(
                                     width: 142,
@@ -126,7 +125,9 @@ class LoginScreen extends StatelessWidget {
                         padding: EdgeInsets.only(bottom: 55.0),
                         child: Align(
                             alignment: Alignment.bottomCenter,
-                            child: ComplexButton(isLogin: true,)),
+                            child: ComplexButton(
+                              isLogin: true,
+                            )),
                       ),
                     ],
                   ),

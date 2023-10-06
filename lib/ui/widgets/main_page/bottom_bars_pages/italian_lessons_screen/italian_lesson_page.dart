@@ -14,9 +14,8 @@ import '../../../../../config/palette.dart';
 import '../../main_menu_pages/italian_lesson/italian_data_show.dart';
 
 class ItalianPage extends StatefulWidget {
-
   bool? fromHomePage;
-   ItalianPage({Key? key,this.fromHomePage}) : super(key: key);
+  ItalianPage({Key? key, this.fromHomePage}) : super(key: key);
 
   @override
   State<ItalianPage> createState() => _ItalianPageState();
@@ -61,8 +60,13 @@ class _ItalianPageState extends State<ItalianPage>
         extendBodyBehindAppBar: true,
         body: CustomScrollView(slivers: [
           SliverAppBar(
-            leading:isWhichPlatform? IconButton(
-              onPressed: ()=>Navigator.of(context).pop(), icon: Icon(Icons.arrow_back_ios_new_outlined),color:Palette.appBarTitleColor,):null,
+            leading: isWhichPlatform
+                ? IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: Icon(Icons.arrow_back_ios_new_outlined),
+                    color: Palette.appBarTitleColor,
+                  )
+                : null,
             leadingWidth: isWhichPlatform ? 20 : null,
             title: Align(
               alignment: Alignment.centerLeft,

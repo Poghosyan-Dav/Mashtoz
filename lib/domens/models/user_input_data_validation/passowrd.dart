@@ -1,6 +1,6 @@
 import 'package:formz/formz.dart';
 
-enum PassowrdValidatorError { invalid,short }
+enum PassowrdValidatorError { invalid, short }
 
 class Password extends FormzInput<String, PassowrdValidatorError> {
   const Password.pure() : super.pure('');
@@ -10,10 +10,9 @@ class Password extends FormzInput<String, PassowrdValidatorError> {
   static RegExp _passwordShortRegex = RegExp(r"^.{1,4}$");
   @override
   PassowrdValidatorError? validator(String? value) {
-    if(!_passwordRegex.hasMatch(value!)){
-      return  PassowrdValidatorError.short;
+    if (!_passwordRegex.hasMatch(value!)) {
+      return PassowrdValidatorError.short;
     }
     return null;
   }
-
 }

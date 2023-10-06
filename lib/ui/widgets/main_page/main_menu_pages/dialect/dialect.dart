@@ -27,7 +27,11 @@ class _DialectState extends State<Dialect> with SingleTickerProviderStateMixin {
         body: CustomScrollView(
           slivers: [
             SliverAppBar(
-              leading: IconButton(onPressed: ()=>Navigator.of(context).pop(), icon: Icon(Icons.arrow_back_ios_new_outlined),color: Palette.appBarTitleColor,),
+              leading: IconButton(
+                onPressed: () => Navigator.of(context).pop(),
+                icon: Icon(Icons.arrow_back_ios_new_outlined),
+                color: Palette.appBarTitleColor,
+              ),
               title: Text(
                 'Համաբարբառ',
                 style: TextStyle(
@@ -153,9 +157,6 @@ class _ArmenianItalianState extends State<_ArmenianItalian> {
                               .toLowerCase()
                               .contains(Api.armAlphapet[index])
                           ? () {
-
-
-
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -168,33 +169,34 @@ class _ArmenianItalianState extends State<_ArmenianItalian> {
                                           )));
                             }
                           : null,
-                      child:   Container(
-                      width: 50,
-                      child: Card(
-                  semanticContainer: false,
-                  child: Container(
-                  width: 50,
-                  child: Center(
-                  child: Text(
-                  '${Api.armAlphapet[index].toUpperCase()}',
-                  style: TextStyle(
-                  fontFamily: 'ArshaluyseArtU',
-                  fontSize: 20,
-                  fontStyle: FontStyle.normal,
-                  fontWeight: FontWeight.bold,
-                  color: characters
-                      .toString()
-                      .toLowerCase()
-                      .contains(Api.armAlphapet[index])
-                  ? null
-                      : Color.fromRGBO(186, 166, 177, 1),
-                  ),
-                  ),
-                  ),
-                  ),
-                  ),
+                      child: Container(
+                        width: 50,
+                        child: Card(
+                          semanticContainer: false,
+                          child: Container(
+                            width: 50,
+                            child: Center(
+                              child: Text(
+                                '${Api.armAlphapet[index].toUpperCase()}',
+                                style: TextStyle(
+                                  fontFamily: 'ArshaluyseArtU',
+                                  fontSize: 20,
+                                  fontStyle: FontStyle.normal,
+                                  fontWeight: FontWeight.bold,
+                                  color: characters
+                                          .toString()
+                                          .toLowerCase()
+                                          .contains(Api.armAlphapet[index])
+                                      ? null
+                                      : Color.fromRGBO(186, 166, 177, 1),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),);
+                  );
                 }),
               ),
             );

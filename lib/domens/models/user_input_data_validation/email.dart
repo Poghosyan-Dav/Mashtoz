@@ -15,4 +15,3 @@ class Email extends FormzInput<String, EmailValidator> {
     return _emailRegExp.hasMatch(value!) ? null : EmailValidator.invalid;
   }
 }
-

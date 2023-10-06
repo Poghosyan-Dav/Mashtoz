@@ -24,12 +24,14 @@ class SignupForm extends StatelessWidget {
         if (state.status.isSubmissionSuccess) {
           tabProvider.login();
           context.read<RegisterCubit>().logOut();
-          Navigator.of(context,rootNavigator: true)
-              .pushAndRemoveUntil(MaterialPageRoute(builder: (_) => const HomeScreen()),(Route<dynamic> route) => false);
+          Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (_) => const HomeScreen()),
+              (Route<dynamic> route) => false);
         } else if (state.status.isSubmissionFailure) {
           var email = state.errorMessage?['email'];
           var passwords = state.errorMessage?['password'];
-          final List<dynamic>? error = email ?? passwords ?? ['Register Failure'];
+          final List<dynamic>? error =
+              email ?? passwords ?? ['Register Failure'];
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
             ..showSnackBar(
@@ -50,7 +52,7 @@ class SignupForm extends StatelessWidget {
                         width: 20,
                         child: CircularProgressIndicator(
                           valueColor:
-                          AlwaysStoppedAnimation<Color>(Palette.main),
+                              AlwaysStoppedAnimation<Color>(Palette.main),
                         ),
                       )
                     ],
@@ -100,10 +102,10 @@ class _EmailIput extends StatelessWidget {
           decoration: InputDecoration(
             focusedBorder: const UnderlineInputBorder(
                 borderSide:
-                BorderSide(color: Palette.textLineOrBackGroundColor)),
+                    BorderSide(color: Palette.textLineOrBackGroundColor)),
             enabledBorder: const UnderlineInputBorder(
                 borderSide:
-                BorderSide(color: Palette.textLineOrBackGroundColor)),
+                    BorderSide(color: Palette.textLineOrBackGroundColor)),
             labelText: 'էլ. փոստ',
             labelStyle: const TextStyle(
               fontFamily: 'GHEAGrapalat',
@@ -111,7 +113,9 @@ class _EmailIput extends StatelessWidget {
               color: Palette.labelText,
             ),
             focusColor: Palette.labelText,
-            errorText: state.email.invalid && !state.email.value.isEmpty ? 'Մուտքագրված հասցեն սխալ է' : null,
+            errorText: state.email.invalid && !state.email.value.isEmpty
+                ? 'Մուտքագրված հասցեն սխալ է'
+                : null,
           ),
           onChanged: (email) =>
               context.read<RegisterCubit>().emailChanged(email),
@@ -135,10 +139,10 @@ class _FullNameInput extends StatelessWidget {
           decoration: InputDecoration(
             focusedBorder: const UnderlineInputBorder(
                 borderSide:
-                BorderSide(color: Palette.textLineOrBackGroundColor)),
+                    BorderSide(color: Palette.textLineOrBackGroundColor)),
             enabledBorder: const UnderlineInputBorder(
                 borderSide:
-                BorderSide(color: Palette.textLineOrBackGroundColor)),
+                    BorderSide(color: Palette.textLineOrBackGroundColor)),
             labelText: 'Անուն Ազգանուն',
             labelStyle: const TextStyle(
               fontFamily: 'GHEAGrapalat',
@@ -185,10 +189,10 @@ class _PasswordInputState extends State<PasswordInput> {
           decoration: InputDecoration(
             focusedBorder: const UnderlineInputBorder(
                 borderSide:
-                BorderSide(color: Color.fromRGBO(255, 255, 255, 1))),
+                    BorderSide(color: Color.fromRGBO(255, 255, 255, 1))),
             enabledBorder: const UnderlineInputBorder(
                 borderSide:
-                BorderSide(color: Color.fromRGBO(255, 255, 255, 1))),
+                    BorderSide(color: Color.fromRGBO(255, 255, 255, 1))),
             labelText: 'Գաղտնաբառ',
             labelStyle: const TextStyle(
                 fontFamily: 'GHEAGrapalat',
@@ -200,17 +204,24 @@ class _PasswordInputState extends State<PasswordInput> {
                 onTap: _togglePassword,
                 child: !isHiddenPassword
                     ? const Icon(
-                  Icons.visibility,
-                  color: Palette.textLineOrBackGroundColor,
-                )
+                        Icons.visibility,
+                        color: Palette.textLineOrBackGroundColor,
+                      )
                     : const Icon(
-                  Icons.visibility_off,
-                  color: Palette.textLineOrBackGroundColor,
-                ),
+                        Icons.visibility_off,
+                        color: Palette.textLineOrBackGroundColor,
+                      ),
               ),
             ),
-            errorText: state.password.error == PassowrdValidatorError.invalid && state.password.invalid && !state.password.value.isEmpty  ? 'Գաղտնաբառը պետք է պարունակի 8 նիշ, 1 մեծատառ,\n1 նշան և 1 թիվ' :
-            state.password.error == PassowrdValidatorError.short && state.password.invalid && !state.password.value.isEmpty ?"նվազագույն երկարությունը 8": null,
+            errorText: state.password.error == PassowrdValidatorError.invalid &&
+                    state.password.invalid &&
+                    !state.password.value.isEmpty
+                ? 'Գաղտնաբառը պետք է պարունակի 8 նիշ, 1 մեծատառ,\n1 նշան և 1 թիվ'
+                : state.password.error == PassowrdValidatorError.short &&
+                        state.password.invalid &&
+                        !state.password.value.isEmpty
+                    ? "նվազագույն երկարությունը 8"
+                    : null,
           ),
           obscureText: isHiddenPassword,
           onChanged: (password) =>
@@ -241,13 +252,14 @@ class _SignupButtonState extends State<_SignupButton> {
   Widget build(BuildContext context) {
     return BlocBuilder<RegisterCubit, RegisterState>(builder: (context, state) {
       return GestureDetector(
-        onTap: (){
+        onTap: () {
           print('Status :: ${state.status.isPure}');
-        if (state.status.isValidated) {
-          isActive();
-          print('Status :: ${state.status.isValidated}');
-          context.read<RegisterCubit>().signUpCredentials();
-        }},
+          if (state.status.isValidated) {
+            isActive();
+            print('Status :: ${state.status.isValidated}');
+            context.read<RegisterCubit>().signUpCredentials();
+          }
+        },
         child: SizedBox(
           width: 47,
           height: 40,
@@ -283,7 +295,6 @@ class _SignupButtonState extends State<_SignupButton> {
                       color: state.status.isValidated
                           ? Palette.main
                           : Palette.disableButton,
-
                     ),
                     Align(
                       alignment: Alignment.centerLeft,
@@ -327,5 +338,3 @@ class _SignupButtonState extends State<_SignupButton> {
 //     );
 //   }
 // }
-
-

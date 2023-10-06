@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -52,11 +51,11 @@ class _DictionaryArmItlState extends State<DictionaryArmItl>
   final List<Object> characters;
   Future<List<Data>?>? charctersData;
   final bool isShow;
-@override
+  @override
   void initState() {
-
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -158,7 +157,7 @@ class _DelegateChildState extends State<DelegateChild>
   final bookDataProvider = BookDataProvider();
   final String characterByindex;
   final int characterIndex;
-   Object characters;
+  Object characters;
   final userDataProvider = UserDataProvider();
   int? custemerId;
   bool isShowingDialog = false;
@@ -186,17 +185,19 @@ class _DelegateChildState extends State<DelegateChild>
 
     super.initState();
   }
-  int indeChars(){
+
+  int indeChars() {
     var chars = characters as List<String>;
     int index = 0;
-    for(var i=0;i<chars.length;i++){
-      if(chars[i].toLowerCase().contains(characterByindex.toLowerCase())){
+    for (var i = 0; i < chars.length; i++) {
+      if (chars[i].toLowerCase().contains(characterByindex.toLowerCase())) {
         index = i;
         break;
       }
     }
     return index;
   }
+
   Widget buildData() {
     print('dadas');
     return FutureBuilder<List<Data>?>(
@@ -238,36 +239,35 @@ class _DelegateChildState extends State<DelegateChild>
                       child: ListTile(
                         title: Html(
                             shrinkWrap: true,
-                            onLinkTap: (url, _, __, ___) async {
-
-                               await bookDataProvider
-                                    .getDialect_Encyclopaedia_Characters(Api.italianDictionaryCharacters).then((value) {
-
-
-                                  if(url!=null){
-                                    Uri myUrl = Uri.parse("$url");
-                                    String characterB = myUrl.pathSegments[1];
-                                    print(characterB); // Output: B
-                                    print("Opening $characterB...");
-                                    if(url.contains('http') || url.contains('https') ){
-                                 Navigator.push(context,MaterialPageRoute(builder: (_)=>DictionaryArmItl(characters: value as List<Object>, characterByindex: characterB, characterIndex: characterIndex, isShow: false)));
-                                 // await launch(
-                                 //   url,
-                                 // );
-                                 } else {
-                                 throw 'Could not launch $url';
-                                 }
-                               }
-
-                               }
-                                );
-                              },
-
-                            onImageTap: (src, _, __, ___) {
-                              print(src);
-                            },
-                            onImageError: (exception, stackTrace) {
-                              print(exception);
+                            onLinkTap: (url, _, __) async {
+                              await bookDataProvider
+                                  .getDialect_Encyclopaedia_Characters(
+                                      Api.italianDictionaryCharacters)
+                                  .then((value) {
+                                if (url != null) {
+                                  Uri myUrl = Uri.parse("$url");
+                                  String characterB = myUrl.pathSegments[1];
+                                  print(characterB); // Output: B
+                                  print("Opening $characterB...");
+                                  if (url.contains('http') ||
+                                      url.contains('https')) {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (_) => DictionaryArmItl(
+                                                characters:
+                                                    value as List<Object>,
+                                                characterByindex: characterB,
+                                                characterIndex: characterIndex,
+                                                isShow: false)));
+                                    // await launch(
+                                    //   url,
+                                    // );
+                                  } else {
+                                    throw 'Could not launch $url';
+                                  }
+                                }
+                              });
                             },
                             data: '''${data?[index].body} '''),
                       ),
@@ -303,9 +303,10 @@ class _DelegateChildState extends State<DelegateChild>
                           Spacer(),
                           InkWell(
                             onTap: () {
-
-
-                                userIsSign(context,data?[index].id,);
+                              userIsSign(
+                                context,
+                                data?[index].id,
+                              );
 
                               //    showDialog(
                               // context: context,
@@ -343,11 +344,11 @@ class _DelegateChildState extends State<DelegateChild>
   @override
   Widget build(BuildContext context) {
     print("dadas");
-    var chars  = characters as List<String>;
+    var chars = characters as List<String>;
     //List<String> sortChars= chars.sort();
     return DefaultTabController(
         initialIndex: indeChars(),
-        length:chars.length,
+        length: chars.length,
         child: Scaffold(
             backgroundColor: Palette.textLineOrBackGroundColor,
             appBar: PreferredSize(
@@ -380,14 +381,10 @@ class _DelegateChildState extends State<DelegateChild>
                           print(wordsIt.elementAt(index).toLowerCase());
                           setState(() {
                             isShow
-                                ?
-                                    charctersDataArmenian =
-                                        getData(chars[index],isShow)
-
-
-                                    : charctersDataItalian =
-                                getData(chars[index],isShow);
-
+                                ? charctersDataArmenian =
+                                    getData(chars[index], isShow)
+                                : charctersDataItalian =
+                                    getData(chars[index], isShow);
                           });
                         },
                         tabs: isShow
@@ -457,28 +454,27 @@ class _DelegateChildState extends State<DelegateChild>
                                   .contains(e.toLowerCase())
                               ? buildData()
                               : Container(
-                            child: Center(
-                              child: Text('Empty data'),
-                            ),
-                          ),
+                                  child: Center(
+                                    child: Text('Empty data'),
+                                  ),
+                                ),
                         )
                         .toList())));
   }
 
-  void userIsSign(BuildContext context,int? typeId) async {
-    final tabProvider = Provider.of<TabProvider>(context,listen: false);
+  void userIsSign(BuildContext context, int? typeId) async {
+    final tabProvider = Provider.of<TabProvider>(context, listen: false);
 
-    var data = <String,dynamic>{};
-    await   userDataProvider.fetchUserInfo().then((value) {
-
-      data =  <String, dynamic>{
+    var data = <String, dynamic>{};
+    await userDataProvider.fetchUserInfo().then((value) {
+      data = <String, dynamic>{
         'type': isShow ? 'armenians' : 'italians',
         'type_id': typeId,
         'customer_id': value?.id,
       };
     });
-    if(data.isNotEmpty){
-      tabProvider.updateSaveData(data,context);
+    if (data.isNotEmpty) {
+      tabProvider.updateSaveData(data, context);
       if (!isShowingDialog) {
         isShowingDialog = true;
         showDialog(
@@ -495,10 +491,12 @@ class _DelegateChildState extends State<DelegateChild>
       }
     }
   }
-  Future<List<Data>?>? getData(String char,bool isShow) {
+
+  Future<List<Data>?>? getData(String char, bool isShow) {
     Future.delayed(Duration(milliseconds: 1200));
-    return bookDataProvider.getDataByCharacters(
-       isShow ?Api.armenianDictionaryByCharacters(char.toLowerCase()):Api.italianDictionaryByCharacters(char.toLowerCase()));
+    return bookDataProvider.getDataByCharacters(isShow
+        ? Api.armenianDictionaryByCharacters(char.toLowerCase())
+        : Api.italianDictionaryByCharacters(char.toLowerCase()));
   }
 }
 

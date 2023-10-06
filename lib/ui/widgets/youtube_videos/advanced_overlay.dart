@@ -4,7 +4,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 class VideoView extends StatefulWidget {
   final String link;
-  const VideoView({Key? key,required this.link}) : super(key: key);
+  const VideoView({Key? key, required this.link}) : super(key: key);
 
   @override
   State<VideoView> createState() => _VideoViewState();
@@ -14,10 +14,9 @@ class _VideoViewState extends State<VideoView> {
   late final WebViewController _controller;
 
   bool isLoading = false;
-  
+
   @override
   void initState() {
-
     // late final PlatformWebViewControllerCreationParams params;
     // if (WebViewPlatform.instance is WebKitWebViewPlatform) {
     //   params = WebKitWebViewControllerCreationParams(
@@ -46,41 +45,48 @@ class _VideoViewState extends State<VideoView> {
     super.initState();
     makeLoading();
   }
-  void makeLoading(){
-    Future.delayed(Duration(milliseconds: 400),(){setState(() {
-      isLoading = true;
-    });});
+
+  void makeLoading() {
+    Future.delayed(Duration(milliseconds: 400), () {
+      setState(() {
+        isLoading = true;
+      });
+    });
   }
+
   @override
   Widget build(BuildContext context) {
-    return   Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0.0,
-        leading: Align(
-        alignment: Alignment.topLeft,
-        child: IconButton(
-        color: Colors.white,
-        onPressed: () {
-      Navigator.pop(context, true);
-    },
-    icon: Icon(Icons.arrow_back_ios_new_outlined),
-
-     ))),
+    return Scaffold(
+        backgroundColor: Colors.black,
+        appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0.0,
+            leading: Align(
+                alignment: Alignment.topLeft,
+                child: IconButton(
+                  color: Colors.white,
+                  onPressed: () {
+                    Navigator.pop(context, true);
+                  },
+                  icon: Icon(Icons.arrow_back_ios_new_outlined),
+                ))),
         body: Center(
-    child:!isLoading? Center(child: CircularProgressIndicator(color: Palette.main,),) : Container(
-      color: Colors.black,
-      child: WebView(
-        initialUrl: widget.link,
-        javascriptMode: JavascriptMode.unrestricted,
-        onWebViewCreated: (controller){
-           _controller = controller;
-        },
-
-      ),
-    ),
-
-    ));
+          child: !isLoading
+              ? Center(
+                  child: CircularProgressIndicator(
+                    color: Palette.main,
+                  ),
+                )
+              : Container(
+                  color: Colors.black,
+                  child: WebView(
+                    initialUrl: widget.link,
+                    javascriptMode: JavascriptMode.unrestricted,
+                    onWebViewCreated: (controller) {
+                      _controller = controller;
+                    },
+                  ),
+                ),
+        ));
   }
 }

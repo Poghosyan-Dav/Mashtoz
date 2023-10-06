@@ -199,7 +199,6 @@ class _TestBookDataYutubePlayerState extends State<TestBookDataYutubePlayer> {
                         InkWell(
                           onTap: () {
                             print('kisvel');
-                           
                           },
                           child: Row(
                             children: [

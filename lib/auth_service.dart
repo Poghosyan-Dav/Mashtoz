@@ -24,11 +24,9 @@ class AuthService {
     if (token != null) {
       // Check if the token has expired
       Map<String, dynamic> decodedToken = json.decode(
-          ascii.decode(
-              base64.decode(base64.normalize(token.split(".")[1]))
-          )
-      );
-      if (DateTime.fromMillisecondsSinceEpoch(decodedToken['exp'] * 1000).isBefore(DateTime.now())) {
+          ascii.decode(base64.decode(base64.normalize(token.split(".")[1]))));
+      if (DateTime.fromMillisecondsSinceEpoch(decodedToken['exp'] * 1000)
+          .isBefore(DateTime.now())) {
         // Token has expired, log the user out
         await _sessionDataProvider.deleteAllToken();
         return false;
@@ -40,21 +38,22 @@ class AuthService {
     return false;
   }
 
-
   // void hasSignInfo(BuildContext context,FirebaseAuth user,OAuthCredential oAuthCredential){
- //   Future.delayed(Duration(seconds: 2),(){
- //     context.read<LoginCubit>().emailChanged("matucox.matucox@gmail.com");
- //     context.read<LoginCubit>().passwordChanged("matucox");
- //
- //    }).whenComplete(() => context.read<LoginCubit>().loginWithCredentials());
- //
- // }
+  //   Future.delayed(Duration(seconds: 2),(){
+  //     context.read<LoginCubit>().emailChanged("matucox.matucox@gmail.com");
+  //     context.read<LoginCubit>().passwordChanged("matucox");
+  //
+  //    }).whenComplete(() => context.read<LoginCubit>().loginWithCredentials());
+  //
+  // }
 
   Future<Widget> handleAuthState() async {
     bool isSign = await hasToken();
     User? result = FirebaseAuth.instance.currentUser;
     print("handleAuthState $isSign");
-    return (result != null && isSign == true) || isSign  == true ? const AccountPage() : LoginScreen();
+    return (result != null && isSign == true) || isSign == true
+        ? const AccountPage()
+        : LoginScreen();
   }
 
   // signInWithGoogle(BuildContext context) async {
@@ -97,51 +96,50 @@ class AuthService {
   signOut() {
     FirebaseAuth.instance.signOut();
   }
-   Future<FirebaseApp> initializeFirebase({
+
+  Future<FirebaseApp> initializeFirebase({
     required BuildContext context,
-     required bool fromLogin,
+    required bool fromLogin,
   }) async {
     FirebaseApp firebaseApp = await Firebase.initializeApp();
 
     User? user = FirebaseAuth.instance.currentUser;
-    if(fromLogin){
+    if (fromLogin) {
       if (user != null) {
         print(user.email);
-      bool isTrue =  await _userDataProvider.signInWithEmailAndPassword(email: '${user.email}',password: '${user.uid}');
-      if(isTrue){
-        context.read<UserLogOutNotifier>().userSignWigGoogle(true, context);
-
-      } else{
-        ScaffoldMessenger.of(context)
-          ..hideCurrentSnackBar()
-          ..showSnackBar(
-            const SnackBar(
-              content: Text('Login Failure'),
-            ),
-          );
-      }
-
-      } else{
+        bool isTrue = await _userDataProvider.signInWithEmailAndPassword(
+            email: '${user.email}', password: '${user.uid}');
+        if (isTrue) {
+          context.read<UserLogOutNotifier>().userSignWigGoogle(true, context);
+        } else {
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              const SnackBar(
+                content: Text('Login Failure'),
+              ),
+            );
+        }
+      } else {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) =>  LoginScreen(
-            ),
+            builder: (context) => LoginScreen(),
           ),
         );
       }
-    }else{
-      if(user != null){
-        var result =   await  _userDataProvider.createUserWithNAmeEmailAndPassword(email: '${user.email}',fullName: '${user.displayName}',
-            password: '${user.uid}'
-        );
+    } else {
+      if (user != null) {
+        var result = await _userDataProvider.createUserWithNAmeEmailAndPassword(
+            email: '${user.email}',
+            fullName: '${user.displayName}',
+            password: '${user.uid}');
         if (result['success']) {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
-              builder: (context) => const HomeScreen(
-              ),
+              builder: (context) => const HomeScreen(),
             ),
           );
-        }  else{
+        } else {
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
             ..showSnackBar(
@@ -150,48 +148,48 @@ class AuthService {
               ),
             );
         }
-
-      } else{
+      } else {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) =>  LoginScreen(
-            ),
+            builder: (context) => LoginScreen(),
           ),
         );
       }
     }
 
-
     return firebaseApp;
   }
-  Future<String?> signInwithGoogle(BuildContext context,bool fromLogin) async {
+
+  Future<String?> signInwithGoogle(BuildContext context, bool fromLogin) async {
     try {
       final GoogleSignInAccount? googleSignInAccount =
-      await _googleSignIn.signIn();
+          await _googleSignIn.signIn();
       final GoogleSignInAuthentication googleSignInAuthentication =
-      await googleSignInAccount!.authentication;
+          await googleSignInAccount!.authentication;
       final AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleSignInAuthentication.accessToken,
         idToken: googleSignInAuthentication.idToken,
       );
-      await _auth.signInWithCredential(credential).then((value) =>initializeFirebase(context: context,fromLogin: fromLogin));
+      await _auth.signInWithCredential(credential).then((value) =>
+          initializeFirebase(context: context, fromLogin: fromLogin));
     } on FirebaseAuthException catch (e) {
       print(e.message);
       throw e;
     }
     return null;
   }
-  Future<void> signInWithFacebook(BuildContext context,bool fromLogin) async {
+
+  Future<void> signInWithFacebook(BuildContext context, bool fromLogin) async {
     try {
       final LoginResult loginResult = await FacebookAuth.instance.login();
-      if(loginResult!=null){
+      if (loginResult != null) {
         final OAuthCredential? facebookAuthCredential =
-        FacebookAuthProvider.credential(loginResult.accessToken!.token);
-        await _auth?.signInWithCredential(facebookAuthCredential!).then((value) => initializeFirebase(context: context,fromLogin: fromLogin));
+            FacebookAuthProvider.credential(loginResult.accessToken!.token);
+        await _auth?.signInWithCredential(facebookAuthCredential!).then(
+            (value) =>
+                initializeFirebase(context: context, fromLogin: fromLogin));
         print('ddddddadasionnnn :${loginResult.message}');
       }
-
-
     } on FirebaseAuthException catch (e) {
       showSnackBar(context, e.message!);
       print(e.message);

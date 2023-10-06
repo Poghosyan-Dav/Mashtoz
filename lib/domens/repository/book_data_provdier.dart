@@ -30,7 +30,8 @@ class BookDataProvider {
   String? _cachedETag; // declare a private field to store the ETag value
 
   //Fetch Category List
-  Future<List<BookCategory>> getCategoryLists(String url,bool isFromMenu) async {
+  Future<List<BookCategory>> getCategoryLists(
+      String url, bool isFromMenu) async {
     var libraryList = <BookCategory>[];
     //   try {
 
@@ -45,12 +46,21 @@ class BookDataProvider {
 
     var success = body['success'];
     if (success == true) {
-      try{
+      try {
         var data = body['data'];
-        var newData =(data as List).map((e) => BookCategory.fromJson(e) as BookCategory).toList();
-        if(isFromMenu) newData.insert(2, BookCategory(categoryTitle: null, id: null, title: 'ԻՏԱԼԵՐԵՆ֊ՀԱՅԵՐԵՆ ԲԱՌԱՐԱՆ', type: 'dictionary'));
+        var newData = (data as List)
+            .map((e) => BookCategory.fromJson(e) as BookCategory)
+            .toList();
+        if (isFromMenu)
+          newData.insert(
+              2,
+              BookCategory(
+                  categoryTitle: null,
+                  id: null,
+                  title: 'ԻՏԱԼԵՐԵՆ֊ՀԱՅԵՐԵՆ ԲԱՌԱՐԱՆ',
+                  type: 'dictionary'));
         return newData;
-      }catch(e){
+      } catch (e) {
         print(e);
       }
 
@@ -132,12 +142,14 @@ class BookDataProvider {
   //
   //   return libraryList;
   // }
-  Future<List<dynamic>?> getLibraryBooksByCategory(int idCategory,bool isFromPullRefresh) async {
+  Future<List<dynamic>?> getLibraryBooksByCategory(
+      int idCategory, bool isFromPullRefresh) async {
     List<dynamic> libraryList = [];
     List<dynamic>? updatedLibraryList = [];
 
     // Check if response is cached
-    var file = await cacheManager?.getFileFromCache(Api.libraryCategoryById(idCategory.toString()));
+    var file = await cacheManager
+        ?.getFileFromCache(Api.libraryCategoryById(idCategory.toString()));
 
     if (file != null) {
       print('Fetching from cache');
@@ -149,44 +161,45 @@ class BookDataProvider {
           libraryList.add(data);
         }
       });
-     if(isFromPullRefresh){
-       // Fetch data from network to check for updates
-       var response = await http.get(
-         Uri.parse(Api.libraryCategoryById(idCategory.toString())),
-         headers: <String, String>{
-           'Content-Type': 'application/json',
-         },
-       );
+      if (isFromPullRefresh) {
+        // Fetch data from network to check for updates
+        var response = await http.get(
+          Uri.parse(Api.libraryCategoryById(idCategory.toString())),
+          headers: <String, String>{
+            'Content-Type': 'application/json',
+          },
+        );
 
-       var responseBody = json.decode(response.body);
-       var responseContent = responseBody['data']['content'];
-       var success = responseBody['success'];
+        var responseBody = json.decode(response.body);
+        var responseContent = responseBody['data']['content'];
+        var success = responseBody['success'];
 
-       if (success == true) {
-         List<dynamic>? updatedLibraryList = [];
+        if (success == true) {
+          List<dynamic>? updatedLibraryList = [];
 
-         Map.from(responseContent).forEach((key, value) {
-           if (key.toString().contains(Map.from(value).values.first.toString())) {
-             var data = Content.fromJson(value);
-             if (data != null) {
-               updatedLibraryList.add(data);
-             }
-           }
-         });
+          Map.from(responseContent).forEach((key, value) {
+            if (key
+                .toString()
+                .contains(Map.from(value).values.first.toString())) {
+              var data = Content.fromJson(value);
+              if (data != null) {
+                updatedLibraryList.add(data);
+              }
+            }
+          });
 
-         if (!listEquals(updatedLibraryList, libraryList)) {
-           // Cache the response and update the libraryList
-           await cacheManager?.putFile(
-             Api.libraryCategoryById(idCategory.toString()),
-             response.bodyBytes,
-           );
-           libraryList = updatedLibraryList;
-         }
-       } else {
-         print('Failed to fetch data');
-       }
-     }
-
+          if (!listEquals(updatedLibraryList, libraryList)) {
+            // Cache the response and update the libraryList
+            await cacheManager?.putFile(
+              Api.libraryCategoryById(idCategory.toString()),
+              response.bodyBytes,
+            );
+            libraryList = updatedLibraryList;
+          }
+        } else {
+          print('Failed to fetch data');
+        }
+      }
 
       return libraryList;
     }
@@ -217,17 +230,14 @@ class BookDataProvider {
         }
       }
 
-        if (!listEquals(updatedLibraryList, libraryList)) {
-          // Cache the response and update the libraryList
-          await cacheManager?.putFile(
-            Api.libraryCategoryById(idCategory.toString()),
-            response.bodyBytes,
-          );
-          libraryList = updatedLibraryList;
-        }
-
-
-
+      if (!listEquals(updatedLibraryList, libraryList)) {
+        // Cache the response and update the libraryList
+        await cacheManager?.putFile(
+          Api.libraryCategoryById(idCategory.toString()),
+          response.bodyBytes,
+        );
+        libraryList = updatedLibraryList;
+      }
     } catch (e) {
       print('Error: $e');
     }
@@ -457,7 +467,6 @@ class BookDataProvider {
       var body = json.decode(response.body);
       var success = body['success'];
 
-
       if (success == true) {
         var data = body['data'];
         if (data is List) {
@@ -488,10 +497,8 @@ class BookDataProvider {
       print("Error: $error");
     }
 
-
     return dialects;
   }
-
 
   Future<List<Data>> getDataByCharactersForHome(String url) async {
     var dialects = <Data>[];
@@ -544,7 +551,6 @@ class BookDataProvider {
     return dialects;
   }
 
-
   //Words of Day
   Future<WordOfDay?> getWordsOfDay() async {
     var response = await http.get(
@@ -576,19 +582,17 @@ class BookDataProvider {
     var body = json.decode(response.body);
     var success = body['success'];
     var data = body['data'];
-    try{
+    try {
       if (success == true && response.statusCode == 200) {
         Map.from(data).forEach((key, value) {
-          if(value != null ){
+          if (value != null) {
             var iData = WordOfDay.fromJson(value);
             listDaysWord.add(iData);
           }
         });
-          return  listDaysWord ;
-
+        return listDaysWord;
       }
-    }
-    catch(e){
+    } catch (e) {
       print(e);
     }
 
@@ -656,13 +660,11 @@ class BookDataProvider {
 
             homeData = updateHomeData;
 
-              // Cache the response
-              await cacheManager.putFile(
-                Api.getHomeData,
-                response.bodyBytes,
-              );
-
-
+            // Cache the response
+            await cacheManager.putFile(
+              Api.getHomeData,
+              response.bodyBytes,
+            );
           } else {
             // Handle error case
             var error = responseBody['error'] ?? 'Unknown error';
@@ -689,16 +691,15 @@ class BookDataProvider {
         updateHomeData = data;
 
         homeData = updateHomeData;
-          // Cache the response
-          await cacheManager.putFile(
-            Api.getHomeData,
-            response.bodyBytes,
-            eTag: response.headers['etag'] ?? '',
-            // Set the maximum cache age (in seconds)
-            maxAge: Duration(seconds: 10),
-            // Set the maximum cache size (in bytes)
-          );
-
+        // Cache the response
+        await cacheManager.putFile(
+          Api.getHomeData,
+          response.bodyBytes,
+          eTag: response.headers['etag'] ?? '',
+          // Set the maximum cache age (in seconds)
+          maxAge: Duration(seconds: 10),
+          // Set the maximum cache size (in bytes)
+        );
 
       } else {
         // Handle error case
@@ -714,7 +715,6 @@ class BookDataProvider {
     return HomeData.fromJson(homeData);
   }
 
-
   Future<void> updateHomeAfterPushNotification(BuildContext context) async {
     final MyBloc bloc = BlocProvider.of<MyBloc>(context);
 
@@ -724,14 +724,16 @@ class BookDataProvider {
 
       // We can execute these three tasks concurrently using Future.wait
       await Future.wait([
-        getDataByCharactersForHome(Api.encyclopediasByCharacters(value.encyclopedias?.first)),
-        getDataByCharactersForHome(Api.dialectBYCharacters(value.dialects?.first)),
-        getDataByCharactersForHome(Api.audioLibrariesByCharacters(value.audiolibraries)),
-      ]).catchError((error){
+        getDataByCharactersForHome(
+            Api.encyclopediasByCharacters(value.encyclopedias?.first)),
+        getDataByCharactersForHome(
+            Api.dialectBYCharacters(value.dialects?.first)),
+        getDataByCharactersForHome(
+            Api.audioLibrariesByCharacters(value.audiolibraries)),
+      ]).catchError((error) {
         bloc.add(const UpdateScreenEvent(false));
         print('Error occurred during API call: $error');
       });
-
 
       bloc.add(const UpdateScreenEvent(false));
 
@@ -742,10 +744,13 @@ class BookDataProvider {
       print('Error: $e');
     }
   }
+
   Future<void> updateBooksAfterPushNotification() async {
     try {
+      print('Sexem DAvs');
       // Fetch the home data using await to make the code cleaner and more readable
-      final List<BookCategory> value = await getCategoryLists(Api.categoryListUrl, false);
+      final List<BookCategory> value =
+          await getCategoryLists(Api.categoryListUrl, false);
 
       // Use Future.forEach to execute the tasks concurrently
       await Future.forEach(value, (BookCategory nv) async {
@@ -753,17 +758,12 @@ class BookDataProvider {
           await getLibraryBooksByCategory(nv.id!, true);
         }
       });
-
     } catch (e) {
       // Handle any potential errors here
       print('Error: $e');
     }
   }
 }
-
-
-
-
 
 String responses = """{
         "success": true,
@@ -893,7 +893,8 @@ bool deepEquals(dynamic object1, dynamic object2) {
   if (object1 is Map && object2 is Map) {
     if (object1.length != object2.length) return false;
     for (var key in object1.keys) {
-      if (!object2.containsKey(key) || !deepEquals(object1[key], object2[key])) {
+      if (!object2.containsKey(key) ||
+          !deepEquals(object1[key], object2[key])) {
         return false;
       }
     }

@@ -1,4 +1,3 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -19,13 +18,13 @@ class CoupleButtons extends StatelessWidget {
           children: [
             Ink(
               child: InkWell(
-                onTap: () async{
+                onTap: () async {
                   print('gmail taped');
                   AuthService service = new AuthService();
                   try {
-                    await service.signInwithGoogle(context,isLogin);
+                    await service.signInwithGoogle(context, isLogin);
                     //Navigator.push(context, MaterialPageRoute(builder: (_)=>HomeScreen()));
-                  } catch(e) {
+                  } catch (e) {
                     if (e is FirebaseAuthException) {
                       showMessage(e.message!, context);
                     }
@@ -40,43 +39,43 @@ class CoupleButtons extends StatelessWidget {
             const SizedBox(width: 16.0),
             Ink(
               child: InkWell(
-                onTap: () async{
-    print('gmail taped');
-    AuthService service = new AuthService();
-    try {
-    await service.signInWithFacebook(context,isLogin);
-    } catch(e) {
-    if (e is FirebaseAuthException) {
-    showMessage(e.message!, context);
-    }
-    }
-    },
+                onTap: () async {
+                  print('gmail taped');
+                  AuthService service = new AuthService();
+                  try {
+                    await service.signInWithFacebook(context, isLogin);
+                  } catch (e) {
+                    if (e is FirebaseAuthException) {
+                      showMessage(e.message!, context);
+                    }
+                  }
+                },
                 child: SvgPicture.asset('assets/images/Facebook.svg'),
               ),
             ),
           ],
         ));
   }
-        void showMessage(String message,BuildContext context ) {
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text("Error"),
-              content: Text(message),
-              actions: [
-                TextButton(
-                  child: Text("Ok"),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                )
-              ],
-            );
-          });
-    }
 
+  void showMessage(String message, BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Error"),
+            content: Text(message),
+            actions: [
+              TextButton(
+                child: Text("Ok"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        });
   }
+}
 
 class ComplexButton extends StatelessWidget {
   final bool isLogin;
@@ -147,8 +146,8 @@ class SignUpButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextButton(
       onPressed: () {
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) =>  SignupScreen()));
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => SignupScreen()));
       },
       child: const Text(
         'Գրանցվել հիմա',
@@ -168,12 +167,11 @@ class SignUpButton extends StatelessWidget {
 class SignUpButton2 extends StatelessWidget {
   const SignUpButton2({Key? key}) : super(key: key);
 
-
-@override
+  @override
   Widget build(BuildContext context) {
     return TextButton(
       onPressed: () {
-     Navigator.of(context).pop();
+        Navigator.of(context).pop();
       },
       child: const Text(
         'Մուտք գործել',

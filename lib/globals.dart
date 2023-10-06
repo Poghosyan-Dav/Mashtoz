@@ -117,11 +117,14 @@ class Api {
   static String get categoryListUrl => '$api_url/libraries/categoryList';
 
   // static libraryCategoryById(id) => '$api_url/libraries/$id';
-  static String libraryCategoryById(String id,) {
+  static String libraryCategoryById(
+    String id,
+  ) {
     var url = '$api_url/libraries/$id';
 
     return url;
   }
+
   //ItalianLesson API
   static String get italianLessons => '$api_url/lessons';
 
@@ -149,7 +152,6 @@ class Api {
   static search(query) => '$api_url/search?search=$query';
 
   //Search results
-  static searchReuslts({String? type, int? id}) =>
-      '$api_url/byType/$type/$id';
+  static searchReuslts({String? type, int? id}) => '$api_url/byType/$type/$id';
   static List<String> get armAlphapet => wordsArm;
 }

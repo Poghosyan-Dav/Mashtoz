@@ -129,7 +129,7 @@ class _GalleryItemState extends State<GalleryItem> {
                               children: [
                                 Container(
                                   color: Color.fromRGBO(246, 246, 246, 1),
-                                  child:  Stack(
+                                  child: Stack(
                                     children: [
                                       GridView.builder(
                                         shrinkWrap: true,
@@ -141,22 +141,26 @@ class _GalleryItemState extends State<GalleryItem> {
                                         itemBuilder: (context, index) {
                                           print(galery);
                                           return Container(
-                                              color:
-                                                  Color.fromRGBO(246, 246, 246, 1),
-                                              padding: const EdgeInsets.symmetric(
-                                                  horizontal: 5.0),
+                                              color: Color.fromRGBO(
+                                                  246, 246, 246, 1),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 5.0),
                                               child: GestureDetector(
                                                 onTap: () {
                                                   Navigator.of(context).push(
                                                     MaterialPageRoute(
-                                                      builder: (_) => GalleryView(
-                                                        url: (galery
-                                                                is Gallery.Gallery)
+                                                      builder: (_) =>
+                                                          GalleryView(
+                                                        url: (galery is Gallery
+                                                                .Gallery)
                                                             ? galery
-                                                                .images![index].img
+                                                                .images![index]
+                                                                .img
                                                             : galery,
                                                         imagesUrl: (galery
-                                                                is Gallery.Gallery)
+                                                                is Gallery
+                                                                .Gallery)
                                                             ? galery.images
                                                             : [],
                                                         currentIndex: index,
@@ -165,16 +169,24 @@ class _GalleryItemState extends State<GalleryItem> {
                                                   );
                                                 },
                                                 child: Container(
-                                                  child: (galery is Gallery.Gallery)
+                                                  child: (galery
+                                                          is Gallery.Gallery)
                                                       ? CachedNetworkImage(
-                                                      placeholder: (context, url) => Center(child: CircularProgressIndicator(color: Palette.main,)),
-
-                                                      imageUrl:
+                                                          placeholder: (context,
+                                                                  url) =>
+                                                              Center(
+                                                                  child:
+                                                                      CircularProgressIndicator(
+                                                                color: Palette
+                                                                    .main,
+                                                              )),
+                                                          imageUrl:
                                                               '${galery.images?[index].img}')
                                                       : Text(
                                                           'Այս բաժնում նկարներ չկան',
                                                           style: TextStyle(
-                                                              color: Colors.black),
+                                                              color:
+                                                                  Colors.black),
                                                         ),
                                                 ),
                                               ));
@@ -185,11 +197,18 @@ class _GalleryItemState extends State<GalleryItem> {
                                           mainAxisSpacing: 20.0,
                                         ),
                                       ),
-                                    if(galery is List<dynamic>) Positioned.fill(
-                                        child: Align(
-                                            alignment: Alignment.center,
-                                            child: Center(child: Text('Այս բաժնում նկարներ չկան',style: TextStyle(fontSize: 18,color: Palette.barColor),))),
-                                      ),
+                                      if (galery is List<dynamic>)
+                                        Positioned.fill(
+                                          child: Align(
+                                              alignment: Alignment.center,
+                                              child: Center(
+                                                  child: Text(
+                                                'Այս բաժնում նկարներ չկան',
+                                                style: TextStyle(
+                                                    fontSize: 18,
+                                                    color: Palette.barColor),
+                                              ))),
+                                        ),
                                     ],
                                   ),
                                 ),

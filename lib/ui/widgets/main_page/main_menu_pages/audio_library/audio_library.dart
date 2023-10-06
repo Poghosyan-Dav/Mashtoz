@@ -47,7 +47,12 @@ class _AudioLibraryState extends State<AudioLibrary>
             //       statusBarColor: Color.fromRGBO(25, 4, 18, 1)),
             // ),
             SliverAppBar(
-              leading: IconButton(onPressed: ()=>Navigator.of(context,rootNavigator: true).pop(), icon: Icon(Icons.arrow_back_ios_new_outlined),color: Palette.appBarTitleColor,),
+              leading: IconButton(
+                onPressed: () =>
+                    Navigator.of(context, rootNavigator: true).pop(),
+                icon: Icon(Icons.arrow_back_ios_new_outlined),
+                color: Palette.appBarTitleColor,
+              ),
               title: Text(
                 'Ձայնադարան',
                 style: TextStyle(
@@ -151,7 +156,6 @@ class _ArmenianItalianState extends State<_ArmenianItalian> {
                             .contains(Api.armAlphapet[index])
                         ? () {
                             Navigator.push(
-
                                 context,
                                 MaterialPageRoute(
                                     builder: (_) => AudioLibraryByCharacters(
@@ -163,8 +167,7 @@ class _ArmenianItalianState extends State<_ArmenianItalian> {
                                         )));
                           }
                         : null,
-                    child:
-                    Card(
+                    child: Card(
                       semanticContainer: false,
                       child: Container(
                         width: 50,
@@ -177,9 +180,9 @@ class _ArmenianItalianState extends State<_ArmenianItalian> {
                               fontStyle: FontStyle.normal,
                               fontWeight: FontWeight.bold,
                               color: characters
-                                  .toString()
-                                  .toLowerCase()
-                                  .contains(Api.armAlphapet[index])
+                                      .toString()
+                                      .toLowerCase()
+                                      .contains(Api.armAlphapet[index])
                                   ? null
                                   : Color.fromRGBO(186, 166, 177, 1),
                             ),

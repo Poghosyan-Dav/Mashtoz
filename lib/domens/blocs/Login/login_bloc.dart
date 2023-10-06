@@ -45,7 +45,7 @@ class LoginCubit extends Cubit<LoginState> {
     }
   }
 
-  void logOut(){
+  void logOut() {
     emit(state.copyWith(status: FormzStatus.pure));
   }
 }

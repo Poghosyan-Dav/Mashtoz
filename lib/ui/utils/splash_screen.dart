@@ -29,62 +29,61 @@ class _MySplashScreenState extends State<MySplashScreen> {
   }
 
   void play() async {
-
-
-    if (isActive == true){
+    if (isActive == true) {
       await Future.delayed(Duration(milliseconds: 5000));
       Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => const HomeScreen()),
-              (Route<dynamic> route) => false);
+          (Route<dynamic> route) => false);
     }
-
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Color.fromRGBO(83, 66, 77, 1),
-        body: ConnectivityBuilder(
-            builder: (context, isConnected, status) {
-              if (isConnected == true) {
-                isActive = true;  play();
-                return Stack(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 50),
-                      child: Align(
-                        alignment: Alignment.topCenter,
-                        child: Text(
-                          'Բարի գալուստ',
-                          style: TextStyle(
-                              fontFamily: 'GHEAGrapalat',
-                              fontSize: 30,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.white),
-                        ),
-                      ),
+        body: ConnectivityBuilder(builder: (context, isConnected, status) {
+          if (isConnected == true) {
+            isActive = true;
+            play();
+            return Stack(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 50),
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: Text(
+                      'Բարի գալուստ',
+                      style: TextStyle(
+                          fontFamily: 'GHEAGrapalat',
+                          fontSize: 30,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.white),
                     ),
-                    Center(
-                      child: Container(
-                        height: 500,
-                        width: SizeConfig.screenWidth,
-                        child: RiveAnimation.asset(
-                          'assets/images/mashtoz3.riv',
-                          alignment: Alignment.center,
-                        ),
-                      ),
+                  ),
+                ),
+                Center(
+                  child: Container(
+                    height: 500,
+                    width: SizeConfig.screenWidth,
+                    child: RiveAnimation.asset(
+                      'assets/images/mashtoz3.riv',
+                      alignment: Alignment.center,
                     ),
-                  ],
-                );
-
-              }
-              return Center(child: AlertDialog(
-                elevation: 0.1,
-                backgroundColor: Palette.barColor,
-                title: Text('Միացրեք ինտերնետը',style: TextStyle(color: Colors.white),),
-
-              ));
-            }));
+                  ),
+                ),
+              ],
+            );
+          }
+          return Center(
+              child: AlertDialog(
+            elevation: 0.1,
+            backgroundColor: Palette.barColor,
+            title: Text(
+              'Միացրեք ինտերնետը',
+              style: TextStyle(color: Colors.white),
+            ),
+          ));
+        }));
   }
 }
 // import 'package:flutter/material.dart';

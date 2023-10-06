@@ -23,10 +23,10 @@ class ItaliaLessonShow extends StatefulWidget {
 
   @override
   State<ItaliaLessonShow> createState() => ItaliaLessonShowState(
-    lessons: lessons,
-    isShow: isShow,
-    idLessons: idLessons,
-  );
+        lessons: lessons,
+        isShow: isShow,
+        idLessons: idLessons,
+      );
 }
 
 class ItaliaLessonShowState extends State<ItaliaLessonShow> {
@@ -63,147 +63,150 @@ class ItaliaLessonShowState extends State<ItaliaLessonShow> {
 
     return lessons != null
         ? Scaffold(
-      backgroundColor: Palette.textLineOrBackGroundColor,
-      body: Padding(
-        padding: const EdgeInsets.only(right: 20, left: 20.0),
-        child: CustomScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          scrollDirection: Axis.vertical,
-          slivers: [
-            orientation != Orientation.landscape
-                ? SliverAppBar(
-              floating: false,
-              pinned: true,
-              leading: Container(
-                width: 7,
-                height: 14,
-                child: IconButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: const Icon(
-                    Icons.arrow_back_ios_new_outlined,
-                    color: Palette.appBarTitleColor,
-                  ),
-                  padding: const EdgeInsets.only(right: double.infinity),
-                  alignment: Alignment.center,
-                ),
-              ),
-              expandedHeight: 77,
-              backgroundColor: Palette.textLineOrBackGroundColor,
-              elevation: 0,
-              automaticallyImplyLeading: false,
-              systemOverlayStyle: const SystemUiOverlayStyle(
-                statusBarColor: Color.fromRGBO(25, 4, 18, 1),
-              ),
-              actions: const [
-                MenuShow(),
-              ],
-            )
-                : const SliverToBoxAdapter(),
-            SliverToBoxAdapter(
-              child: SingleChildScrollView(
+            backgroundColor: Palette.textLineOrBackGroundColor,
+            body: Padding(
+              padding: const EdgeInsets.only(right: 20, left: 20.0),
+              child: CustomScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                child: Column(
-                  children: [
-                    Container(
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.of(context, rootNavigator: true).push(
-                            MaterialPageRoute(
-                              builder: (context) => VideoView(
-                                link: lessons!.link!,
+                scrollDirection: Axis.vertical,
+                slivers: [
+                  orientation != Orientation.landscape
+                      ? SliverAppBar(
+                          floating: false,
+                          pinned: true,
+                          leading: Container(
+                            width: 7,
+                            height: 14,
+                            child: IconButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              icon: const Icon(
+                                Icons.arrow_back_ios_new_outlined,
+                                color: Palette.appBarTitleColor,
                               ),
+                              padding:
+                                  const EdgeInsets.only(right: double.infinity),
+                              alignment: Alignment.center,
                             ),
-                          );
-                        },
-                        child: Stack(
-                          children: [
-                            CachedNetworkImage(
-                              imageUrl: lessons!.image!,
-                            ),
-                            const Positioned.fill(
-                              child: Align(
-                                alignment: Alignment.center,
-                                child: Center(
-                                  child: Icon(
-                                    Icons.play_arrow,
-                                    color: Colors.white,
-                                    size: 70,
-                                  ),
-                                ),
-                              ),
-                            ),
+                          ),
+                          expandedHeight: 77,
+                          backgroundColor: Palette.textLineOrBackGroundColor,
+                          elevation: 0,
+                          automaticallyImplyLeading: false,
+                          systemOverlayStyle: const SystemUiOverlayStyle(
+                            statusBarColor: Color.fromRGBO(25, 4, 18, 1),
+                          ),
+                          actions: const [
+                            MenuShow(),
                           ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width,
-                      child: Text(
-                        lessons!.title ?? '',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 12.0,
-                          fontFamily: 'GHEAGrapalat',
-                          letterSpacing: 1,
-                          color: Color.fromRGBO(84, 112, 126, 1),
-                        ),
-                        textAlign: TextAlign.start,
-                      ),
-                    ),
-                    const SizedBox(height: 15.0),
-                    const Divider(),
-                    orientation != Orientation.landscape
-                        ? Container(
-                      color: Palette.textLineOrBackGroundColor,
-                      width: double.infinity,
-                      height: 49,
-                      child: Row(
+                        )
+                      : const SliverToBoxAdapter(),
+                  SliverToBoxAdapter(
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: Column(
                         children: [
-                          InkWell(
-                            onTap: () async {
-                              await Share.share(lessons!.link!);
-                            },
-                            child: Row(
-                              children: [
-                                SvgPicture.asset('assets/images/այքըններ.svg'),
-                                const SizedBox(width: 6),
-                                const Text('Կիսվել'),
-                              ],
+                          Container(
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.of(context, rootNavigator: true).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => VideoView(
+                                      link: lessons!.link!,
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Stack(
+                                children: [
+                                  CachedNetworkImage(
+                                    imageUrl: lessons!.image!,
+                                  ),
+                                  const Positioned.fill(
+                                    child: Align(
+                                      alignment: Alignment.center,
+                                      child: Center(
+                                        child: Icon(
+                                          Icons.play_arrow,
+                                          color: Colors.white,
+                                          size: 70,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                          const Spacer(),
-                          InkWell(
-                            onTap: () {
-                              userIsSign(context);
-                            },
-                            child: Row(
-                              children: [
-                                SvgPicture.asset('assets/images/վելացնել1.svg'),
-                                const SizedBox(width: 6),
-                                const Text('Պահել'),
-                              ],
+                          const SizedBox(height: 20),
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width,
+                            child: Text(
+                              lessons!.title ?? '',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 12.0,
+                                fontFamily: 'GHEAGrapalat',
+                                letterSpacing: 1,
+                                color: Color.fromRGBO(84, 112, 126, 1),
+                              ),
+                              textAlign: TextAlign.start,
                             ),
                           ),
+                          const SizedBox(height: 15.0),
+                          const Divider(),
+                          orientation != Orientation.landscape
+                              ? Container(
+                                  color: Palette.textLineOrBackGroundColor,
+                                  width: double.infinity,
+                                  height: 49,
+                                  child: Row(
+                                    children: [
+                                      InkWell(
+                                        onTap: () async {
+                                          await Share.share(lessons!.link!);
+                                        },
+                                        child: Row(
+                                          children: [
+                                            SvgPicture.asset(
+                                                'assets/images/այքըններ.svg'),
+                                            const SizedBox(width: 6),
+                                            const Text('Կիսվել'),
+                                          ],
+                                        ),
+                                      ),
+                                      const Spacer(),
+                                      InkWell(
+                                        onTap: () {
+                                          userIsSign(context);
+                                        },
+                                        child: Row(
+                                          children: [
+                                            SvgPicture.asset(
+                                                'assets/images/վելացնել1.svg'),
+                                            const SizedBox(width: 6),
+                                            const Text('Պահել'),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : const SizedBox(height: 0.1),
                         ],
                       ),
-                    )
-                        : const SizedBox(height: 0.1),
-                  ],
-                ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
-    )
+          )
         : const Center(
-      child: CircularProgressIndicator(
-        color: Palette.main,
-      ),
-    );
+            child: CircularProgressIndicator(
+              color: Palette.main,
+            ),
+          );
   }
 
   void userIsSign(BuildContext context) async {

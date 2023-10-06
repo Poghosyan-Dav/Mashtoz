@@ -33,7 +33,13 @@ class _SearchPageState extends State<SearchPage> {
 
   var searchbooks = <Search>[];
   var searcjBookforDisplay = <Search>[];
-  List<String> strongList = ['libraries', 'lessons', 'autiolibraries',"italians","encyclopedias"];
+  List<String> strongList = [
+    'libraries',
+    'lessons',
+    'autiolibraries',
+    "italians",
+    "encyclopedias"
+  ];
   String selected = 'libraries';
 
   @override
@@ -48,48 +54,55 @@ class _SearchPageState extends State<SearchPage> {
     controller.dispose();
     super.initState();
   }
-void searchPageination(int? id,String? type){
-  switch (type) {
-  case 'libraries':
-    Navigator.of(context,rootNavigator: true ).push(
-      MaterialPageRoute(
-        builder: (_) => BookInitalScreen(
-          idLib: id.toString(),
-          categoryID: '',
-        ),
-      ),
-    );
-  print('Selected: libraries');
-  break;
-  case 'lessons':
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (_) => ItaliaLessonShow(
-              idLessons: id.toString(),
-              isShow: true,
-            )));
-  print('Selected: lessons');
-  break;
-  case 'autiolibraries':
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (_) =>  AudioLibraryDataShow(adbId:id.toString(),)));
-  // Handle case for 'autiolibraries'
-  print('Selected: autiolibraries');
-  break;
-    case 'encyclopedias':
-      Navigator.push(context, MaterialPageRoute(builder: (_)=> BookReadScreen(
-        encyId:id.toString(),
-      )));
-      break;
 
-    default:
-  // Handle default case
-  print('Selected: unknown');
+  void searchPageination(int? id, String? type) {
+    switch (type) {
+      case 'libraries':
+        Navigator.of(context, rootNavigator: true).push(
+          MaterialPageRoute(
+            builder: (_) => BookInitalScreen(
+              idLib: id.toString(),
+              categoryID: '',
+            ),
+          ),
+        );
+        print('Selected: libraries');
+        break;
+      case 'lessons':
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) => ItaliaLessonShow(
+                      idLessons: id.toString(),
+                      isShow: true,
+                    )));
+        print('Selected: lessons');
+        break;
+      case 'autiolibraries':
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) => AudioLibraryDataShow(
+                      adbId: id.toString(),
+                    )));
+        // Handle case for 'autiolibraries'
+        print('Selected: autiolibraries');
+        break;
+      case 'encyclopedias':
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) => BookReadScreen(
+                      encyId: id.toString(),
+                    )));
+        break;
+
+      default:
+        // Handle default case
+        print('Selected: unknown');
+    }
   }
-}
+
   Future init() async {
     final books = await SearchBookProvider.fetchAllBooks(query);
 
@@ -132,10 +145,15 @@ void searchPageination(int? id,String? type){
               slivers: [
                 // ),
                 SliverAppBar(
-                  leading:  isWhichPlatform ? IconButton(
-                    padding: EdgeInsets.only(right: 20),
-                    alignment: Alignment.centerRight,
-                    onPressed: ()=>Navigator.of(context).pop(), icon: Icon(Icons.arrow_back_ios_new_outlined),color:Palette.appBarTitleColor,):null,
+                  leading: isWhichPlatform
+                      ? IconButton(
+                          padding: EdgeInsets.only(right: 20),
+                          alignment: Alignment.centerRight,
+                          onPressed: () => Navigator.of(context).pop(),
+                          icon: Icon(Icons.arrow_back_ios_new_outlined),
+                          color: Palette.appBarTitleColor,
+                        )
+                      : null,
                   leadingWidth: isWhichPlatform ? 20 : null,
                   title: Align(
                     alignment: Alignment.centerLeft,
@@ -197,7 +215,6 @@ void searchPageination(int? id,String? type){
                           onChanged: searchBook,
                         ),
                       ),
-
                       searchbooks.isNotEmpty
                           ? Align(
                               alignment: Alignment.centerLeft,
@@ -216,17 +233,23 @@ void searchPageination(int? id,String? type){
                                 ),
                               ),
                             )
-                          :   searchbooks.isEmpty && query.isNotEmpty || controller.text.length>0 ? Center(child: Align(
-                        alignment:Alignment.centerLeft,
-                            child: Text(
-                        'Նման արդյունք չի գտնվել',
-                        style: TextStyle(
-                              color: Color.fromRGBO(122, 108, 115, 1),
-                              fontFamily: "GHEAGrapalat",
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.w400),
-                      ),
-                          ),):SizedBox(height: 20.0),
+                          : searchbooks.isEmpty && query.isNotEmpty ||
+                                  controller.text.length > 0
+                              ? Center(
+                                  child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      'Նման արդյունք չի գտնվել',
+                                      style: TextStyle(
+                                          color:
+                                              Color.fromRGBO(122, 108, 115, 1),
+                                          fontFamily: "GHEAGrapalat",
+                                          fontSize: 16.0,
+                                          fontWeight: FontWeight.w400),
+                                    ),
+                                  ),
+                                )
+                              : SizedBox(height: 20.0),
                       Expanded(
                           child: ResponsiveGridList(
                         horizontalGridSpacing:
@@ -240,12 +263,11 @@ void searchPageination(int? id,String? type){
                             1, // The minimum items to show in a single row. Takes precedence over minItemWidth
                         maxItemsPerRow: 4, // The m
                         children: List.generate(searchbooks.length, (index) {
-
                           Search book = searchbooks[index];
                           print(book.type);
                           return InkWell(
                             onTap: () {
-                              searchPageination(book.id,book.type);
+                              searchPageination(book.id, book.type);
                             },
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,

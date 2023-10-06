@@ -14,7 +14,9 @@ class SearchBookProvider {
     //var body =
     if (response.statusCode == 200) {
       List books = json.decode(response.body)['data'];
-      return books.isNotEmpty? (books).map((e) => Search.fromJson(e)).toList() :[];
+      return books.isNotEmpty
+          ? (books).map((e) => Search.fromJson(e)).toList()
+          : [];
     } else {
       return [];
     }

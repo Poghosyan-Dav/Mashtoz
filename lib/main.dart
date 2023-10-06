@@ -44,10 +44,11 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print('A bg message just showed up :  ${message.messageId}');
 }
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
- Platform.isIOS ? isWhichPlatform = true : isWhichPlatform;
+  Platform.isIOS ? isWhichPlatform = true : isWhichPlatform;
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -62,11 +63,10 @@ void main() async {
     badge: true,
     sound: true,
   );
- await initializeDateFormatting();
+  await initializeDateFormatting();
 
   runApp(const MyApp());
   CacheManager.logLevel = CacheManagerLogLevel.verbose;
-
 }
 
 class MyApp extends StatefulWidget {
@@ -101,30 +101,34 @@ class _MyAppState extends State<MyApp> {
       print("deviceId->$_deviceId");
     });
   }
+
   @override
   void initState() {
     super.initState();
     initPlatformState();
     getToken();
   }
-  void getToken() async {
 
+  void getToken() async {
     String? token = await _firebaseMessaging.getToken();
 
     if (token != null && _deviceId != null) {
       var data = {'device_id': _deviceId, 'fcm_token': token};
-      print("device_id : ${data['device_id']} &\nfcm_token: ${data['fcm_token']}");
+      print(
+          "device_id : ${data['device_id']} &\nfcm_token: ${data['fcm_token']}");
       _userDataProvider.postFCMToken(data);
     }
 
     _firebaseMessaging.onTokenRefresh.listen((newToken) {
       if (newToken != null && _deviceId != null) {
         var data = {'device_id': _deviceId, 'fcm_token': token};
-        print("device_id : ${data['device_id']} &\nfcm_token: ${data['fcm_token']}");
+        print(
+            "device_id : ${data['device_id']} &\nfcm_token: ${data['fcm_token']}");
         _userDataProvider.postFCMToken(data);
       }
     });
   }
+
   @override
   Widget build(BuildContext context) {
     final user = UserDataProvider();
@@ -139,8 +143,9 @@ class _MyAppState extends State<MyApp> {
           Provider<UserDataProvider>(
             create: (_) => UserDataProvider(auth: FirebaseAuth.instance),
           ),
-          ChangeNotifierProvider<UserLogOutNotifier>(create: (_)=> UserLogOutNotifier(),),
-
+          ChangeNotifierProvider<UserLogOutNotifier>(
+            create: (_) => UserLogOutNotifier(),
+          ),
           ChangeNotifierProvider<ContentProvider>(
               create: (_) => ContentProvider()),
           ChangeNotifierProvider<ThemeNotifier>(create: (_) => ThemeNotifier()),
@@ -148,20 +153,18 @@ class _MyAppState extends State<MyApp> {
               create: (_) => UserInfoNotify()),
           ChangeNotifierProvider<BottomColorNotifire>(
               create: (_) => BottomColorNotifire()),
-          ChangeNotifierProvider<BookNotifire>.value(value:  BookNotifire()),
-          ChangeNotifierProvider<BookNotifire>.value(value:  BookNotifire()),
+          ChangeNotifierProvider<BookNotifire>.value(value: BookNotifire()),
+          ChangeNotifierProvider<BookNotifire>.value(value: BookNotifire()),
           ChangeNotifierProvider<FocuseDay>(create: (_) => FocuseDay()),
           ChangeNotifierProvider<TabProvider>(
-    create: (_) => TabProvider(),)
+            create: (_) => TabProvider(),
+          )
         ],
         child: MaterialApp(
           locale: _locale,
           debugShowCheckedModeBanner: false,
           home: // Boxes have finished opening, so render the app UI
-                 const MySplashScreen(),
-
-
-
+              const MySplashScreen(),
         ),
       ),
     );

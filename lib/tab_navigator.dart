@@ -14,11 +14,10 @@ class TabNavigatorRoutes {
   static const String detail = '/detail';
 }
 
-
 class TabNavigator extends StatelessWidget {
   final GlobalKey<NavigatorState> navigatorKey;
   final String tabItem;
-   bool isLogin = false;
+  bool isLogin = false;
   final _sessionProvider = SessionDataProvider();
   late final Map<String, WidgetBuilder> _routes;
 
@@ -32,26 +31,26 @@ class TabNavigator extends StatelessWidget {
       'searchpage': (context) => const SearchPage(),
       'italianpage': (context) => ItalianPage(),
       'accountpage': (context) => FutureBuilder<Object>(
-        future: AuthService().handleAuthState(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            } else {
-              return snapshot.data as Widget;
-            }
-          } else {
-            return const CircularProgressIndicator();
-          }
-        },
-      ),
+            future: AuthService().handleAuthState(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  return snapshot.data as Widget;
+                }
+              } else {
+                return const CircularProgressIndicator();
+              }
+            },
+          ),
     };
   }
 
   @override
   Widget build(BuildContext context) {
     final tabProvider = Provider.of<TabProvider>(context);
-    if(isLogin)tabProvider.login();
+    if (isLogin) tabProvider.login();
     final routeBuilder = _routes[tabItem];
     if (routeBuilder == null) {
       return const SizedBox.shrink();
@@ -64,20 +63,14 @@ class TabNavigator extends StatelessWidget {
     );
   }
 
-
-
-
-
   Future<bool> hasToken() async {
     String? token = await _sessionProvider.readsAccessToken();
     if (token != null) {
       // Check if the token has expired
       Map<String, dynamic> decodedToken = json.decode(
-          ascii.decode(
-              base64.decode(base64.normalize(token.split(".")[1]))
-          )
-      );
-      if (DateTime.fromMillisecondsSinceEpoch(decodedToken['exp'] * 1000).isBefore(DateTime.now())) {
+          ascii.decode(base64.decode(base64.normalize(token.split(".")[1]))));
+      if (DateTime.fromMillisecondsSinceEpoch(decodedToken['exp'] * 1000)
+          .isBefore(DateTime.now())) {
         // Token has expired, log the user out
         await _sessionProvider.deleteAllToken();
         return false;
@@ -88,8 +81,8 @@ class TabNavigator extends StatelessWidget {
     // Token not found, the user is not logged in
     return false;
   }
-  Future<bool> checkUser() async {
 
+  Future<bool> checkUser() async {
     bool isSign = await hasToken();
     User? result = FirebaseAuth.instance.currentUser;
     isLogin = isSign;
