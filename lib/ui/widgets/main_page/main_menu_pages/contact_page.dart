@@ -13,11 +13,11 @@ class Contact extends StatefulWidget {
 }
 
 class _ContactState extends State<Contact> {
-    String emailController  = ' ';
-   String messageConttroller = '';
-   String nameController = '';
-  final   userDataProvider = UserDataProvider();
-  bool? isTap= false;
+  String emailController = ' ';
+  String messageConttroller = '';
+  String nameController = '';
+  final userDataProvider = UserDataProvider();
+  bool? isTap = false;
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -48,7 +48,11 @@ class _ContactState extends State<Contact> {
             //       statusBarColor: Color.fromRGBO(25, 4, 18, 1)),
             // ),
             SliverAppBar(
-              leading: IconButton(onPressed: ()=>Navigator.of(context).pop(), icon: const Icon(Icons.arrow_back_ios_new_outlined),color: const Color.fromRGBO(117, 99, 111, 1),),
+              leading: IconButton(
+                onPressed: () => Navigator.of(context).pop(),
+                icon: const Icon(Icons.arrow_back_ios_new_outlined),
+                color: const Color.fromRGBO(117, 99, 111, 1),
+              ),
               flexibleSpace: Container(
                 margin: const EdgeInsets.only(left: 50),
                 child: const Align(
@@ -118,7 +122,7 @@ class _ContactState extends State<Contact> {
   Widget email() {
     return TextFormField(
       initialValue: '',
-      onChanged: (value){
+      onChanged: (value) {
         setState(() {
           emailController = value!;
         });
@@ -149,7 +153,8 @@ class _ContactState extends State<Contact> {
       keyboardType: TextInputType.emailAddress,
       validator: (value) {
         if (!value!.contains(RegExp(
-            r'^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$'))) {
+          r'^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*\s*$',
+        ))) {
           return 'Մուտքագրված հասցեն սխալ է';
         }
         return null;
@@ -160,7 +165,7 @@ class _ContactState extends State<Contact> {
   Widget fullName() {
     return TextFormField(
       initialValue: '',
-      onChanged: (value){
+      onChanged: (value) {
         setState(() {
           nameController = value;
         });
@@ -189,7 +194,7 @@ class _ContactState extends State<Contact> {
       validator: (value) {
         if (value!.isEmpty ||
             !value.contains(RegExp(
-                r"^(?:[ա-ֆԱ-Ֆա-ֆԱ-Ֆ\w+а-яА-Яа-яА-Яa-zA-Z]{3,} [ա-ֆԱ-Ֆա-ֆԱ-Ֆ\w+а-яА-Яа-яА-Яa-zA-Za-zA-Z]{5,}){0,1}$"))) {
+                r"^\s*(?:[ա-ֆԱ-Ֆա-ֆԱ-Ֆ\w+а-яА-Яа-яА-Яa-zA-Z]{2,}(?:\s+[ա-ֆԱ-Ֆա-ֆԱ-Ֆ\w+а-яА-Яа-яА-Яa-zA-Za-zA-Z]{2,})*)\s*$"))) {
           return 'Մուտքագրված տվյալները սխալ են ';
         }
         return null;
@@ -201,7 +206,7 @@ class _ContactState extends State<Contact> {
     return TextFormField(
       initialValue: '',
       maxLines: 10,
-      onChanged: (value){
+      onChanged: (value) {
         setState(() {
           messageConttroller = value!;
         });
@@ -239,6 +244,14 @@ class _ContactState extends State<Contact> {
     );
   }
 
+  /*
+    'libraries',
+    'encyclopedias',
+    'lessons',
+    'audiolibraries',
+    'armenians',
+    */
+
   Widget sendButton() {
     return Container(
         height: 40,
@@ -246,54 +259,58 @@ class _ContactState extends State<Contact> {
         child: ElevatedButton(
             style: ElevatedButton.styleFrom(
               primary: const Color.fromRGBO(113, 141, 156, 1),
-              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+              shape:
+                  const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
             ),
-            onPressed:isTap ==false? () async {
-              final email = emailController;
-              final name = nameController;
-              final message = messageConttroller;
-              Map parameter = {
-                "name": name,
-                "email": email,
-                "message": message,
-                "locale": "hy"
-              };
+            onPressed: isTap == false
+                ? () async {
+                    String email = emailController;
+                    String name = nameController;
+                    final message = messageConttroller;
 
-              if (_formKey.currentState!.validate()) {
-                print('$email,$name,$message');
-                setState(() {
-                  isTap=true;
-                });
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Processing Data')),
-                );
-          bool isTrue=      await userDataProvider.userContactForm(parameter);
-                if (!isTrue) {
-                  setState(() {
-                    isTap=false;
-                  });
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Processing failure')),
-                  );
-                }
-                else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Message Sent')),
-                  );
+                    name = name.replaceAll(RegExp(r'\s+'), ' ');
+                    email = email.replaceAll(RegExp(r'\s+'), '');
+                    Map parameter = {
+                      "name": name,
+                      "email": email,
+                      "message": message,
+                      "locale": "hy"
+                    };
 
-                  setState(() {
+                    if (_formKey.currentState!.validate()) {
+                      print('$email,$name,$message');
+                      setState(() {
+                        isTap = true;
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Processing Data')),
+                      );
+                      bool isTrue =
+                          await userDataProvider.userContactForm(parameter);
+                      if (!isTrue) {
+                        setState(() {
+                          isTap = false;
+                        });
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Processing failure')),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Message Sent')),
+                        );
 
-                    resetForm();
-                    isTap = false;
-                  });
-                }
-
-              }
-            }:null,
+                        setState(() {
+                          resetForm();
+                          isTap = false;
+                        });
+                      }
+                    }
+                  }
+                : null,
             child: const Text('Ուղարկել')));
   }
+
   void resetForm() {
     _formKey.currentState?.reset();
   }
-
 }

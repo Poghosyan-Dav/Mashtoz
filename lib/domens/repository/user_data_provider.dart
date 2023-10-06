@@ -123,15 +123,13 @@ class UserDataProvider {
     }
   }
 
-
-
   //Sign Up
-  Future<bool> signUp(
+  Future<Map<String, dynamic>> signUp(
       {required String email,
       required String password,
       required String fullName}) async {
-    bool isSuscces = false;
-
+    //bool isSuscces = false;
+    Map<String, dynamic> isSuscces = {};
     isSuscces = await createUserWithNAmeEmailAndPassword(
         email: email, password: password, fullName: fullName);
 
@@ -200,9 +198,9 @@ class UserDataProvider {
   }
 
   //Signup
-  Future<bool> createUserWithNAmeEmailAndPassword(
+  Future<Map<String, dynamic>> createUserWithNAmeEmailAndPassword(
       {String? email, String? password, String? fullName}) async {
-    Map userData = {
+    Map<String, dynamic> userData = {
       'email': email,
       'password': password,
       'full_name': fullName,
@@ -226,15 +224,17 @@ class UserDataProvider {
         startAccessTimer();
         startRefreshTimer();
 
-        return true;
+        return {'success': true};
       } else {
-        print("failed");
-        return false;
+        var message = body['message'];
+        var errors = body['errors'];
+        return {'success': false, 'message': message, 'errors': errors};
       }
     } catch (e) {
       print(e);
     }
-    return false;
+
+    return {'success': false};
   }
 
   //Forgot Password post
@@ -412,9 +412,8 @@ class UserDataProvider {
     return [];
   }
 
-
   //Save Favorite
-  Future<Map<String,bool>> saveFavorite(Map parameters) async {
+  Future<Map<String, bool>> saveFavorite(Map parameters) async {
     var token = await sessionDataProvider.readsAccessToken();
     try {
       var response = await http.post(
@@ -425,38 +424,35 @@ class UserDataProvider {
         },
         body: json.encode(parameters),
       );
-       var body = jsonDecode(response.body);
+      var body = jsonDecode(response.body);
       if (response.statusCode == 200) {
         print('success');
-        var statusCode = response.statusCode ;
-        return {'success':true};
-
+        var statusCode = response.statusCode;
+        return {'success': true};
       } else if (isAcces_Token_TimerActive || response.statusCode == 401) {
         bool isTrue = await refreshToken();
 
         if (isTrue) {
-          return await saveFavorite(parameters); // Call saveFavorite recursively after refreshing token
+          return await saveFavorite(
+              parameters); // Call saveFavorite recursively after refreshing token
         } else {
-          return {'error':false};
+          return {'error': false};
         }
-      } else if (response.statusCode == 400){
-        var statusCode = response.statusCode ;
-        return {'already':true};
-
-
-      }else {
+      } else if (response.statusCode == 400) {
+        var statusCode = response.statusCode;
+        return {'already': true};
+      } else {
         print("failed");
-        return {'error':false};
+        return {'error': false};
       }
     } catch (e) {
       print(e);
-      return {'error':false};
+      return {'error': false};
     }
   }
 
-
   //Delete Favorite
-  Future<Object> deleteFavorite(Map<String,dynamic> parameters) async {
+  Future<Object> deleteFavorite(Map<String, dynamic> parameters) async {
     var token = await sessionDataProvider.readsAccessToken();
     try {
       var response = await http.delete(
@@ -475,11 +471,12 @@ class UserDataProvider {
         bool isTrue = await refreshToken();
 
         if (isTrue) {
-          return await saveFavorite(parameters); // Call saveFavorite recursively after refreshing token
+          return await saveFavorite(
+              parameters); // Call saveFavorite recursively after refreshing token
         } else {
           return false;
         }
-      }else {
+      } else {
         print('Delete $success');
         return false;
       }
@@ -495,12 +492,13 @@ class UserDataProvider {
     if (refresh_token != null) {
       try {
         final client = http.Client();
-        final response = await client.post(Uri.parse(Api.refreshToken),
-            headers: {
-              'Authorization': 'bearer $access_token',
-              'Content-Type': "application/json",
-            },
-            body: <String, dynamic>{'refresh_token': '$refresh_token'}).timeout(Duration(seconds: 30));
+        final response =
+            await client.post(Uri.parse(Api.refreshToken), headers: {
+          'Authorization': 'bearer $access_token',
+          'Content-Type': "application/json",
+        }, body: <String, dynamic>{
+          'refresh_token': '$refresh_token'
+        }).timeout(Duration(seconds: 30));
 
         if (response.statusCode == 200) {
           var body = jsonDecode(response.body);
@@ -520,7 +518,8 @@ class UserDataProvider {
             sessionDataProvider.deleteAllToken();
           } else {
             // Access token expired or invalid, refresh token still valid, try again
-            await Future.delayed(Duration(seconds: 5)); // Wait for 5 seconds before retrying
+            await Future.delayed(
+                Duration(seconds: 5)); // Wait for 5 seconds before retrying
             return await refreshToken();
           }
         } else {
@@ -537,28 +536,35 @@ class UserDataProvider {
     return false;
   }
 
-
-
   Future<bool> postFCMToken(Map parameters) async {
     try {
       var response = await http.post(
-        Uri.parse(api_url + '/notifications/create-token'),
+        Uri.parse('$api_url/notifications/create-token'),
         headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
+          'Content-Type': 'application/json',
         },
-        body: json.encode(parameters),
+        body: jsonEncode(parameters),
       );
-      var success = json.decode(response.body)['success'];
-      if (response.statusCode == 200 && success == true) {
-        print('success');
-        return true;
+
+      if (response.statusCode == 200) {
+        var responseBody = response.body;
+        var responseData = json.decode(responseBody);
+
+        var success = responseData['success'];
+        if (success == true) {
+          print('Success');
+          return true;
+        } else {
+          print('Request failed: ${responseData['error']}');
+          return false;
+        }
       } else {
-        print("failed");
-        return false;
+        print('Request failed with status code: ${response.statusCode}');
       }
     } catch (e) {
-      print(e);
+      print('An error occurred: $e');
     }
+
     return false;
   }
 

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class BookNotifire extends ChangeNotifier {
   String _firstCharacterAudioLib = '';
-  String   _firstCharacterDialect = '';
+  String _firstCharacterDialect = '';
 
   String get firstCharactersDialect => _firstCharacterDialect;
 
@@ -11,7 +11,6 @@ class BookNotifire extends ChangeNotifier {
   void charactersSetDialect(String dialcet) {
     _firstCharacterDialect = dialcet;
     notifyListeners();
-
   }
 
   void charactersSetAudioLib(var characters) {
@@ -22,6 +21,5 @@ class BookNotifire extends ChangeNotifier {
   void resetDatas() {
     _firstCharacterAudioLib = '';
     _firstCharacterDialect = '';
-
   }
 }

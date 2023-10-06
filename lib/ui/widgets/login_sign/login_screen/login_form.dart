@@ -29,24 +29,21 @@ class _LoginFormState extends State<LoginForm> {
       listener: (context, state) {
         if (state.status.isSubmissionSuccess) {
           tabProvider.login();
+          context.read<LoginCubit>().logOut();
           if (tabProvider.currentIndex == 4) {
-            Navigator.of(context,rootNavigator: true).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (_) => const HomeScreen()),(Route<dynamic> route) => false);
+            Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (_) => const HomeScreen()),
+                (Route<dynamic> route) => false);
           } else {
-            Future.delayed(const Duration(milliseconds: 200),(){
+            Future.delayed(const Duration(milliseconds: 200), () {
               Navigator.of(context).pop();
             }).then((_) {
-              if(mounted) {
+              if (mounted) {
                 tabProvider.userIsSign();
               }
             });
-
-
-
           }
-
-        }
-        else if (state.status.isSubmissionFailure) {
+        } else if (state.status.isSubmissionFailure) {
           print('cik isSubmissionFailure');
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
@@ -125,10 +122,10 @@ class _LoginIput extends StatelessWidget {
           decoration: InputDecoration(
             focusedBorder: const UnderlineInputBorder(
                 borderSide:
-                BorderSide(color: Palette.textLineOrBackGroundColor)),
+                    BorderSide(color: Palette.textLineOrBackGroundColor)),
             enabledBorder: const UnderlineInputBorder(
                 borderSide:
-                BorderSide(color: Palette.textLineOrBackGroundColor)),
+                    BorderSide(color: Palette.textLineOrBackGroundColor)),
             labelText: 'էլ. փոստ',
             labelStyle: const TextStyle(
               fontFamily: 'GHEAGrapalat',
@@ -138,7 +135,9 @@ class _LoginIput extends StatelessWidget {
               color: Palette.labelText,
             ),
             focusColor: Palette.labelText,
-            errorText: state.email.invalid && !state.email.value.isEmpty ? 'Մուտքագրված հասցեն սխալ է' : null,
+            errorText: state.email.invalid && !state.email.value.isEmpty
+                ? 'Մուտքագրված հասցեն սխալ է'
+                : null,
           ),
           onChanged: (email) => context.read<LoginCubit>().emailChanged(email),
         );
@@ -175,10 +174,10 @@ class _PasswordInputState extends State<PasswordInput> {
             decoration: InputDecoration(
               focusedBorder: const UnderlineInputBorder(
                   borderSide:
-                  BorderSide(color: Color.fromRGBO(255, 255, 255, 1))),
+                      BorderSide(color: Color.fromRGBO(255, 255, 255, 1))),
               enabledBorder: const UnderlineInputBorder(
                   borderSide:
-                  BorderSide(color: Color.fromRGBO(255, 255, 255, 1))),
+                      BorderSide(color: Color.fromRGBO(255, 255, 255, 1))),
               labelText: 'Գաղտնաբառ',
               labelStyle: const TextStyle(
                   fontFamily: 'GHEAGrapalat',
@@ -192,17 +191,19 @@ class _PasswordInputState extends State<PasswordInput> {
                   onTap: _togglePassword,
                   child: !isHiddenPassword
                       ? const Icon(
-                    Icons.visibility,
-                    color: Palette.textLineOrBackGroundColor,
-                  )
+                          Icons.visibility,
+                          color: Palette.textLineOrBackGroundColor,
+                        )
                       : const Icon(
-                    Icons.visibility_off,
-                    color: Palette.textLineOrBackGroundColor,
-                  ),
+                          Icons.visibility_off,
+                          color: Palette.textLineOrBackGroundColor,
+                        ),
                 ),
               ),
-              errorText:
-              state.password.error == PassowrdValidatorError.short && !state.password.value.isEmpty ?"նվազագույն երկարությունը 4": null,
+              errorText: state.password.error == PassowrdValidatorError.short &&
+                      !state.password.value.isEmpty
+                  ? "նվազագույն երկարությունը 8"
+                  : null,
             ),
             obscureText: isHiddenPassword,
             onChanged: (password) =>
@@ -234,76 +235,73 @@ class _LoginButtonState extends State<_LoginButton> {
     return BlocBuilder<LoginCubit, LoginState>(
         buildWhen: (previous, current) => previous.status != current.status,
         builder: (context, state) {
-          return SizedBox(
-            width: 47,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                SizedBox(
-                  width: 40,
-                  height: 40,
-                  child: Stack(
-                    alignment: Alignment.centerRight,
-                    children: [
-                      /// bottom
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: const BoxDecoration(boxShadow: [
-                          BoxShadow(
-                            color: Color.fromRGBO(0, 0, 0, 0.1),
-                            spreadRadius: -1,
-                            blurRadius: 1,
-                            offset: Offset(7, 5),
+          return GestureDetector(
+            onTap: () {
+              if (state.status.isValidated) {
+                context.read<LoginCubit>().loginWithCredentials();
+
+                setState(() {
+                  isTap = true;
+                });
+                isActive();
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    duration: Duration(milliseconds: 500),
+                    content: Text(
+                      'Տվյալները գտնված չեն։',
+                    )));
+                setState(() {
+                  isTap = false;
+                });
+              }
+              // userDataProvider.logOut();
+            },
+            child: SizedBox(
+              width: 47,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: Stack(
+                      alignment: Alignment.centerRight,
+                      children: [
+                        /// bottom
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: const BoxDecoration(boxShadow: [
+                            BoxShadow(
+                              color: Color.fromRGBO(0, 0, 0, 0.1),
+                              spreadRadius: -1,
+                              blurRadius: 1,
+                              offset: Offset(7, 5),
+                            ),
+                          ]),
+                        ),
+                        Container(
+                          width: 37,
+                          height: 40,
+                          color: state.status.isValidated
+                              ? Palette.main
+                              : Palette.disableButton,
+                        ),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: SizedBox(
+                            width: 26,
+                            child:
+                                SvgPicture.asset('assets/images/Vector 81.svg'),
                           ),
-                        ]),
-                      ),
-                      Container(
-                        width: 37,
-                        height: 40,
-                        color: state.status.isValidated
-                            ? Palette.main
-                            : Palette.disableButton,
-                        child: RawMaterialButton(
-                          splashColor: Palette.whenTapedButton,
-                          onPressed: ()  {
-                            context.read<LoginCubit>().loginWithCredentials();
-                            if (state.status.isValidated) {
-
-
-                              setState(() {
-                                isTap = true;
-                              });
-                              isActive();
-                            } else {
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(SnackBar(
-                                  duration: Duration(milliseconds: 500),
-                                  content: Text(
-                                    'Տվյալները գտնված չեն։',
-                                  )));
-                              setState(() {
-                                isTap=false;
-                              });
-                            }
-                            // userDataProvider.logOut();
-                          },
                         ),
-                      ),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: SizedBox(
-                          width: 26,
-                          child:
-                          SvgPicture.asset('assets/images/Vector 81.svg'),
-                        ),
-                      ),
 
-                      /// top
-                    ],
+                        /// top
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         });

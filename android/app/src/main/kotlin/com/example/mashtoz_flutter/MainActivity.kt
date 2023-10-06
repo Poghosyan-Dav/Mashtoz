@@ -1,4 +1,4 @@
-package com.mashtoc.mashtoc
+package com.end.mashtoz
 
 import io.flutter.embedding.android.FlutterActivity
 

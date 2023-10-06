@@ -39,17 +39,17 @@ class _EcyclopediaByCharactersState extends State<EcyclopediaByCharacters>
     this.characterIndex,
     this.id,
   });
-@override
+  @override
   void initState() {
     super.initState();
   }
+
   final bookDataProvider = BookDataProvider();
   final String? characterByindex;
   final int? id;
   final int? characterIndex;
   final List<Object>? characters;
   Future<List<Data>?>? charctersData;
-
 
   @override
   Widget build(BuildContext context) {
@@ -208,7 +208,7 @@ class _DelegateChildState extends State<DelegateChilds>
 
   @override
   void initState() {
-   var chars= characters as List<String>;
+    var chars = characters as List<String>;
     _tabController = TabController(
         length: chars.length,
         vsync: this,
@@ -218,20 +218,21 @@ class _DelegateChildState extends State<DelegateChilds>
     encyclopediaByCharacters = bookDataProvider
         .getDataByCharacters(Api.encyclopediasByCharacters(characterByindex));
 
-
     super.initState();
   }
-  int indeChars(){
-    var chars= characters as List<String>;
+
+  int indeChars() {
+    var chars = characters as List<String>;
     int index = 0;
-    for(var i=0;i<chars.length;i++){
-      if(chars[i].toLowerCase().contains(characterByindex.toLowerCase())){
+    for (var i = 0; i < chars.length; i++) {
+      if (chars[i].toLowerCase().contains(characterByindex.toLowerCase())) {
         index = i;
         break;
       }
     }
     return index;
   }
+
   Widget buildData() {
     return FutureBuilder<List<Data>?>(
         future: encyclopediaByCharacters,
@@ -275,7 +276,6 @@ class _DelegateChildState extends State<DelegateChilds>
                           context,
                           MaterialPageRoute(
                               builder: (_) => BookReadScreen(
-
                                     encyclopediaBody: data?[index],
                                   )));
                     },
@@ -357,10 +357,10 @@ class _DelegateChildState extends State<DelegateChilds>
 
   @override
   Widget build(BuildContext context) {
-  var chars = characters as List<String>;
+    var chars = characters as List<String>;
     return DefaultTabController(
         initialIndex: indeChars(),
-        length: chars.length ,
+        length: chars.length,
         child: Scaffold(
             backgroundColor: Palette.textLineOrBackGroundColor,
             appBar: PreferredSize(
@@ -389,17 +389,12 @@ class _DelegateChildState extends State<DelegateChilds>
                           labelPadding:
                               const EdgeInsets.symmetric(horizontal: 15),
                           onTap: (index) {
-
-
-
                             setState(() {
-                              encyclopediaByCharacters =getData(chars[index]);
+                              encyclopediaByCharacters = getData(chars[index]);
                             });
                           },
                           tabs: chars.map((tabName) {
-
                             return Tab(
-
                               child: Text(
                                 tabName,
                                 style: TextStyle(
@@ -407,7 +402,6 @@ class _DelegateChildState extends State<DelegateChilds>
                                   fontSize: 23,
                                   fontStyle: FontStyle.normal,
                                   fontWeight: FontWeight.bold,
-
                                 ),
                               ),
                             );
@@ -418,8 +412,7 @@ class _DelegateChildState extends State<DelegateChilds>
 
   Future<List<Data>?>? getData(String char) {
     Future.delayed(Duration(milliseconds: 1200));
-   return bookDataProvider.getDataByCharacters(
-        Api.encyclopediasByCharacters(
-            char.toLowerCase()));
+    return bookDataProvider
+        .getDataByCharacters(Api.encyclopediasByCharacters(char.toLowerCase()));
   }
 }

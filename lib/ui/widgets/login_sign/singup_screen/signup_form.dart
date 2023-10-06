@@ -23,14 +23,19 @@ class SignupForm extends StatelessWidget {
       listener: (context, state) {
         if (state.status.isSubmissionSuccess) {
           tabProvider.login();
-
-          Navigator.of(context,rootNavigator: true)
-              .pushAndRemoveUntil(MaterialPageRoute(builder: (_) => HomeScreen()),(Route<dynamic> route) => false);
+          context.read<RegisterCubit>().logOut();
+          Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (_) => const HomeScreen()),
+              (Route<dynamic> route) => false);
         } else if (state.status.isSubmissionFailure) {
+          var email = state.errorMessage?['email'];
+          var passwords = state.errorMessage?['password'];
+          final List<dynamic>? error =
+              email ?? passwords ?? ['Register Failure'];
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
             ..showSnackBar(
-              SnackBar(content: Text(state.errorMessage ?? 'Sign Up Failure')),
+              SnackBar(content: Text('${error?[0]}')),
             );
         } else if (state.status.isSubmissionInProgress) {
           ScaffoldMessenger.of(context)
@@ -47,7 +52,7 @@ class SignupForm extends StatelessWidget {
                         width: 20,
                         child: CircularProgressIndicator(
                           valueColor:
-                          AlwaysStoppedAnimation<Color>(Palette.main),
+                              AlwaysStoppedAnimation<Color>(Palette.main),
                         ),
                       )
                     ],
@@ -97,10 +102,10 @@ class _EmailIput extends StatelessWidget {
           decoration: InputDecoration(
             focusedBorder: const UnderlineInputBorder(
                 borderSide:
-                BorderSide(color: Palette.textLineOrBackGroundColor)),
+                    BorderSide(color: Palette.textLineOrBackGroundColor)),
             enabledBorder: const UnderlineInputBorder(
                 borderSide:
-                BorderSide(color: Palette.textLineOrBackGroundColor)),
+                    BorderSide(color: Palette.textLineOrBackGroundColor)),
             labelText: 'էլ. փոստ',
             labelStyle: const TextStyle(
               fontFamily: 'GHEAGrapalat',
@@ -108,7 +113,9 @@ class _EmailIput extends StatelessWidget {
               color: Palette.labelText,
             ),
             focusColor: Palette.labelText,
-            errorText: state.email.invalid && !state.email.value.isEmpty ? 'Մուտքագրված հասցեն սխալ է' : null,
+            errorText: state.email.invalid && !state.email.value.isEmpty
+                ? 'Մուտքագրված հասցեն սխալ է'
+                : null,
           ),
           onChanged: (email) =>
               context.read<RegisterCubit>().emailChanged(email),
@@ -132,10 +139,10 @@ class _FullNameInput extends StatelessWidget {
           decoration: InputDecoration(
             focusedBorder: const UnderlineInputBorder(
                 borderSide:
-                BorderSide(color: Palette.textLineOrBackGroundColor)),
+                    BorderSide(color: Palette.textLineOrBackGroundColor)),
             enabledBorder: const UnderlineInputBorder(
                 borderSide:
-                BorderSide(color: Palette.textLineOrBackGroundColor)),
+                    BorderSide(color: Palette.textLineOrBackGroundColor)),
             labelText: 'Անուն Ազգանուն',
             labelStyle: const TextStyle(
               fontFamily: 'GHEAGrapalat',
@@ -182,10 +189,10 @@ class _PasswordInputState extends State<PasswordInput> {
           decoration: InputDecoration(
             focusedBorder: const UnderlineInputBorder(
                 borderSide:
-                BorderSide(color: Color.fromRGBO(255, 255, 255, 1))),
+                    BorderSide(color: Color.fromRGBO(255, 255, 255, 1))),
             enabledBorder: const UnderlineInputBorder(
                 borderSide:
-                BorderSide(color: Color.fromRGBO(255, 255, 255, 1))),
+                    BorderSide(color: Color.fromRGBO(255, 255, 255, 1))),
             labelText: 'Գաղտնաբառ',
             labelStyle: const TextStyle(
                 fontFamily: 'GHEAGrapalat',
@@ -197,17 +204,24 @@ class _PasswordInputState extends State<PasswordInput> {
                 onTap: _togglePassword,
                 child: !isHiddenPassword
                     ? const Icon(
-                  Icons.visibility,
-                  color: Palette.textLineOrBackGroundColor,
-                )
+                        Icons.visibility,
+                        color: Palette.textLineOrBackGroundColor,
+                      )
                     : const Icon(
-                  Icons.visibility_off,
-                  color: Palette.textLineOrBackGroundColor,
-                ),
+                        Icons.visibility_off,
+                        color: Palette.textLineOrBackGroundColor,
+                      ),
               ),
             ),
-            errorText: state.password.error == PassowrdValidatorError.invalid && state.password.invalid && !state.password.value.isEmpty  ? 'Գաղտնաբառը պետք է պարունակի 8 նիշ, 1 մեծատառ,\n1 նշան և 1 թիվ' :
-            state.password.error == PassowrdValidatorError.short && state.password.invalid && !state.password.value.isEmpty ?"նվազագույն երկարությունը 4": null,
+            errorText: state.password.error == PassowrdValidatorError.invalid &&
+                    state.password.invalid &&
+                    !state.password.value.isEmpty
+                ? 'Գաղտնաբառը պետք է պարունակի 8 նիշ, 1 մեծատառ,\n1 նշան և 1 թիվ'
+                : state.password.error == PassowrdValidatorError.short &&
+                        state.password.invalid &&
+                        !state.password.value.isEmpty
+                    ? "նվազագույն երկարությունը 8"
+                    : null,
           ),
           obscureText: isHiddenPassword,
           onChanged: (password) =>
@@ -237,65 +251,65 @@ class _SignupButtonState extends State<_SignupButton> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<RegisterCubit, RegisterState>(builder: (context, state) {
-      return SizedBox(
-        width: 47,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          // mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(
-              width: 40,
-              height: 40,
-              child: Stack(
-                //fit: StackFit.expand,
-                alignment: Alignment.centerRight,
-                //overflow: Overflow.visible,
-                children: [
-                  /// bottom
-                  Container(
-                    width: 40,
-                    height: 40,
-                    // color: Colors.orange,
-                    decoration: const BoxDecoration(boxShadow: [
-                      BoxShadow(
-                        color: Color.fromRGBO(0, 0, 0, 0.1),
-                        spreadRadius: -1,
-                        blurRadius: 1,
-                        offset: Offset(7, 5),
+      return GestureDetector(
+        onTap: () {
+          print('Status :: ${state.status.isPure}');
+          if (state.status.isValidated) {
+            isActive();
+            print('Status :: ${state.status.isValidated}');
+            context.read<RegisterCubit>().signUpCredentials();
+          }
+        },
+        child: SizedBox(
+          width: 47,
+          height: 40,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            // mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                width: 40,
+                height: 40,
+                child: Stack(
+                  //fit: StackFit.expand,
+                  alignment: Alignment.centerRight,
+                  //overflow: Overflow.visible,
+                  children: [
+                    /// bottom
+                    Container(
+                      width: 40,
+                      height: 40,
+                      // color: Colors.orange,
+                      decoration: const BoxDecoration(boxShadow: [
+                        BoxShadow(
+                          color: Color.fromRGBO(0, 0, 0, 0.1),
+                          spreadRadius: -1,
+                          blurRadius: 1,
+                          offset: Offset(7, 5),
+                        ),
+                      ]),
+                    ),
+                    Container(
+                      width: 37,
+                      height: 40,
+                      color: state.status.isValidated
+                          ? Palette.main
+                          : Palette.disableButton,
+                    ),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: SizedBox(
+                        width: 26,
+                        child: SvgPicture.asset('assets/images/Vector 81.svg'),
                       ),
-                    ]),
-                  ),
-                  Container(
-                    width: 37,
-                    height: 40,
-                    color: state.status.isValidated
-                        ? Palette.main
-                        : Palette.disableButton,
-                    child: RawMaterialButton(
-                      splashColor: Palette.whenTapedButton,
-                      onPressed: () {
-                        print('Status :: ${state.status.isPure}');
-                        if (state.status.isValidated) {
-                          isActive();
-                          print('Status :: ${state.status.isValidated}');
-                          context.read<RegisterCubit>().signUpCredentials();
-                        }
-                      },
                     ),
-                  ),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: SizedBox(
-                      width: 26,
-                      child: SvgPicture.asset('assets/images/Vector 81.svg'),
-                    ),
-                  ),
 
-                  /// top
-                ],
+                    /// top
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     });
@@ -324,5 +338,3 @@ class _SignupButtonState extends State<_SignupButton> {
 //     );
 //   }
 // }
-
-

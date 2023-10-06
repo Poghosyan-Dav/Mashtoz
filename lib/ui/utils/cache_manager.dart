@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
-
 const url = 'https://blurha.sh/assets/images/img1.jpg';
 
 /// Example [Widget] showing the functionalities of flutter_cache_manager
@@ -35,7 +34,6 @@ class _CacheManagerPageState extends State<CacheManagerPage> {
       );
     }
     return Container();
-  
   }
 
   void _clearCache() {

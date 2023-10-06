@@ -28,7 +28,7 @@ import '../main_page/main_menu_pages/gallery/galery_item.dart';
 
 class MenuShow extends StatefulWidget {
   final bool fromHomePage;
-  const MenuShow({Key? key,this.fromHomePage = false}) : super(key: key);
+  const MenuShow({Key? key, this.fromHomePage = false}) : super(key: key);
 
   @override
   State<MenuShow> createState() => _MenuShowState();
@@ -50,12 +50,15 @@ class _MenuShowState extends State<MenuShow>
     _controller.dispose();
     super.dispose();
   }
+
   @override
   void initState() {
     fToast = FToast();
     _controller = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 500));
-    userDataProvider.fetchUserInfo().then((value) => custemerId =  value?.id??0);
+    userDataProvider
+        .fetchUserInfo()
+        .then((value) => custemerId = value?.id ?? 0);
     userIsSign();
 
     super.initState();
@@ -100,7 +103,7 @@ class _MenuShowState extends State<MenuShow>
           //     .setColor(Palette.libraryBacgroundColor);
           setState(() {
             _toggleDrawer();
-            menuFuture = bookDataProvider.getCategoryLists(Api.menu,true);
+            menuFuture = bookDataProvider.getCategoryLists(Api.menu, true);
           });
           showGeneralDialog(
               context: context,
@@ -133,7 +136,8 @@ class _MenuShowState extends State<MenuShow>
                                     alignment: Alignment.topCenter,
                                     child: Container(
                                       height: 150,
-                                      padding: const EdgeInsets.only(right: 20.0),
+                                      padding:
+                                          const EdgeInsets.only(right: 20.0),
                                       color: Palette.barColor,
                                       child: AppBar(
                                         leading: const SizedBox(
@@ -164,7 +168,8 @@ class _MenuShowState extends State<MenuShow>
                                               child: Align(
                                                 alignment: Alignment.bottomLeft,
                                                 child: Padding(
-                                                  padding: const EdgeInsets.only(
+                                                  padding:
+                                                      const EdgeInsets.only(
                                                     top: 20.0,
                                                   ),
                                                   child: SvgPicture.asset(
@@ -199,11 +204,8 @@ class _MenuShowState extends State<MenuShow>
                                                             ? Palette
                                                                 .appBarIconMenuColor
                                                             : const Color
-                                                                    .fromRGBO(
-                                                                122,
-                                                                108,
-                                                                115,
-                                                                1),
+                                                                .fromRGBO(122,
+                                                                108, 115, 1),
                                                         fit: BoxFit.cover,
 
                                                         //width: 60,
@@ -212,8 +214,9 @@ class _MenuShowState extends State<MenuShow>
                                                       opacity: 0.15,
                                                       offset:
                                                           const Offset(0, 4),
-                                                      color: const Color.fromRGBO(
-                                                          0, 0, 0, 0.15),
+                                                      color:
+                                                          const Color.fromRGBO(
+                                                              0, 0, 0, 0.15),
                                                     ),
                                                   ],
                                                 ),
@@ -301,13 +304,15 @@ class _MenuShowState extends State<MenuShow>
                                                             ConnectionState
                                                                 .waiting) {
                                                           return Container(
-                                                              padding: const EdgeInsets
-                                                                  .only(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .only(
                                                                       top:
                                                                           50.0),
-                                                              child: const Center(
-                                                                  child:
-                                                                      CircularProgressIndicator(
+                                                              child:
+                                                                  const Center(
+                                                                      child:
+                                                                          CircularProgressIndicator(
                                                                 strokeWidth:
                                                                     2.0,
                                                                 color: Palette
@@ -334,7 +339,8 @@ class _MenuShowState extends State<MenuShow>
                                                                             .topLeft,
                                                                     child:
                                                                         Container(
-                                                                      padding: const EdgeInsets.only(
+                                                                      padding: const EdgeInsets
+                                                                          .only(
                                                                           right:
                                                                               50),
                                                                       child: ListView.builder(
@@ -366,7 +372,6 @@ class _MenuShowState extends State<MenuShow>
                                                                                     ),
                                                                                     onTap: () {
                                                                                       switch (index) {
-
                                                                                         case 0:
                                                                                           Navigator.pop(context);
                                                                                           _toggleDrawer();
@@ -383,7 +388,10 @@ class _MenuShowState extends State<MenuShow>
                                                                                           _toggleDrawer();
                                                                                           Navigator.push(
                                                                                             context,
-                                                                                            MaterialPageRoute(builder: (_) => ItalianPage(fromHomePage: true,)),
+                                                                                            MaterialPageRoute(
+                                                                                                builder: (_) => ItalianPage(
+                                                                                                      fromHomePage: true,
+                                                                                                    )),
                                                                                           );
                                                                                           break;
                                                                                         case 2:
@@ -416,8 +424,7 @@ class _MenuShowState extends State<MenuShow>
                                                                                         case 5:
                                                                                           Navigator.pop(context);
                                                                                           _toggleDrawer();
-                                                                                          Navigator.of(context,rootNavigator: true).push(
-
+                                                                                          Navigator.of(context, rootNavigator: true).push(
                                                                                             MaterialPageRoute(builder: (_) => const AudioLibrary()),
                                                                                           );
                                                                                           break;
@@ -473,7 +480,8 @@ class _MenuShowState extends State<MenuShow>
                                                               'State: ${snapshot.connectionState}');
                                                         }
                                                       }),
-                                                  tabProvider.userHasLogin ||user !=null
+                                                  tabProvider.userHasLogin ||
+                                                          user != null
                                                       ? const Align(
                                                           alignment: Alignment
                                                               .bottomCenter,
@@ -491,10 +499,12 @@ class _MenuShowState extends State<MenuShow>
                                                           height: 0.1,
                                                           width: 0.1,
                                                         ),
-                                                  tabProvider.userHasLogin || user != null
+                                                  tabProvider.userHasLogin ||
+                                                          user != null
                                                       ? Padding(
                                                           padding:
-                                                              const EdgeInsets.only(
+                                                              const EdgeInsets
+                                                                  .only(
                                                                   bottom: 0.1),
                                                           child: Align(
                                                             alignment: Alignment
@@ -502,8 +512,9 @@ class _MenuShowState extends State<MenuShow>
                                                             child: Container(
                                                               // color:
                                                               //     Colors.amber,
-                                                              margin: const EdgeInsets
-                                                                  .only(
+                                                              margin:
+                                                                  const EdgeInsets
+                                                                      .only(
                                                                       right:
                                                                           50),
                                                               height: 50,
@@ -517,17 +528,17 @@ class _MenuShowState extends State<MenuShow>
                                                                 children: [
                                                                   GestureDetector(
                                                                     onTap: () {
-                                                                      tabProvider.logout();
-                                                                     Navigator.of(context).pop();
-                                                                      context.read<UserLogOutNotifier>().usesHasLogOut(true);
-                                                                        _toggleDrawer();
-
-
-
-
-
-
-
+                                                                      tabProvider
+                                                                          .logout();
+                                                                      Navigator.of(
+                                                                              context)
+                                                                          .pop();
+                                                                      context
+                                                                          .read<
+                                                                              UserLogOutNotifier>()
+                                                                          .usesHasLogOut(
+                                                                              true);
+                                                                      _toggleDrawer();
                                                                     },
                                                                     child: Row(
                                                                       mainAxisAlignment:
@@ -576,38 +587,59 @@ class _MenuShowState extends State<MenuShow>
                                   ),
                                 ),
                                 MediaQuery.of(context).size.width >= 520 &&
-                                    MediaQuery.of(context).size.width <= 630 ||
-                                    MediaQuery.of(context).size.width >= 630
+                                            MediaQuery.of(context).size.width <=
+                                                630 ||
+                                        MediaQuery.of(context).size.width >= 630
                                     ? Positioned.fill(
                                         left: 50,
                                         child: Align(
                                           alignment: Alignment.topLeft,
                                           child: Container(
-                                            height: MediaQuery.of(context).size.width >=
+                                            height: MediaQuery.of(context)
+                                                            .size
+                                                            .width >=
                                                         520 &&
-                                                MediaQuery.of(context).size.width <=
+                                                    MediaQuery.of(context)
+                                                            .size
+                                                            .width <=
                                                         630
                                                 ? 200
-                                                : MediaQuery.of(context).size.width >=
+                                                : MediaQuery.of(context)
+                                                                .size
+                                                                .width >=
                                                             630 &&
-                                                MediaQuery.of(context).size.width <=
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width <=
                                                             730
                                                     ? 300
-                                                    : MediaQuery.of(context).size.width >=
+                                                    : MediaQuery.of(context)
+                                                                .size
+                                                                .width >=
                                                             730
                                                         ? 500
                                                         : 400,
-                                            width: MediaQuery.of(context).size.width >=
+                                            width: MediaQuery.of(context)
+                                                            .size
+                                                            .width >=
                                                         520 &&
-                                                MediaQuery.of(context).size.width <=
+                                                    MediaQuery.of(context)
+                                                            .size
+                                                            .width <=
                                                         630
                                                 ? 200
-                                                : MediaQuery.of(context).size.width >=
+                                                : MediaQuery.of(context)
+                                                                .size
+                                                                .width >=
                                                             630 &&
-                                                MediaQuery.of(context).size.width <=
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width <=
                                                             730
                                                     ? 300
-                                                    : MediaQuery.of(context).size.width >=
+                                                    : MediaQuery.of(context)
+                                                                .size
+                                                                .width >=
                                                             730
                                                         ? 500
                                                         : 400,
@@ -639,7 +671,8 @@ class _MenuShowState extends State<MenuShow>
                     parent: animation,
                     curve: Curves.easeInOutCubic,
                   ).drive(
-                    Tween<Offset>(begin: const Offset(0, -1.0), end: Offset.zero),
+                    Tween<Offset>(
+                        begin: const Offset(0, -1.0), end: Offset.zero),
                   ),
                   child: child,
                 );
@@ -696,7 +729,7 @@ class _MenuShowState extends State<MenuShow>
 
   void userIsSign() async {
     final hasId = await userDataProvider.fetchUserInfo();
-    if(mounted){
+    if (mounted) {
       setState(() {
         isture = hasId != null &&
             hasId.fullName != null &&

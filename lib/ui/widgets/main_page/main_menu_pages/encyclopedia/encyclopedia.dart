@@ -51,7 +51,11 @@ class _EcyclopediaState extends State<Ecyclopedia>
             //       statusBarColor: Color.fromRGBO(25, 4, 18, 1)),
             // ),
             SliverAppBar(
-              leading: IconButton(onPressed: ()=>Navigator.of(context).pop(), icon: Icon(Icons.arrow_back_ios_new_outlined),color: Palette.appBarTitleColor,),
+              leading: IconButton(
+                onPressed: () => Navigator.of(context).pop(),
+                icon: Icon(Icons.arrow_back_ios_new_outlined),
+                color: Palette.appBarTitleColor,
+              ),
               title: Text(
                 'Հանրագիտարան',
                 style: TextStyle(
@@ -213,4 +217,3 @@ class _ArmenianItalianState extends State<_ArmenianItalian> {
 }
 
 //Armenian alphabet
- 

@@ -71,7 +71,11 @@ class _DictionaryState extends State<Dictionary>
             //   ],
             // ),
             SliverAppBar(
-              leading: IconButton(onPressed: ()=>Navigator.of(context).pop(), icon: const Icon(Icons.arrow_back_ios_new_outlined),color: Palette.appBarTitleColor,),
+              leading: IconButton(
+                onPressed: () => Navigator.of(context).pop(),
+                icon: const Icon(Icons.arrow_back_ios_new_outlined),
+                color: Palette.appBarTitleColor,
+              ),
               title: const Text(
                 'Բառարան',
                 style: TextStyle(
@@ -213,7 +217,7 @@ class _ArmenianItalianState extends State<_ArmenianItalian> {
                                           )));
                             }
                           : null,
-                      child:Card(
+                      child: Card(
                         semanticContainer: false,
                         child: Container(
                           width: 50,
@@ -226,9 +230,9 @@ class _ArmenianItalianState extends State<_ArmenianItalian> {
                                 fontStyle: FontStyle.normal,
                                 fontWeight: FontWeight.bold,
                                 color: characters
-                                    .toString()
-                                    .toLowerCase()
-                                    .contains(Api.armAlphapet[index])
+                                        .toString()
+                                        .toLowerCase()
+                                        .contains(Api.armAlphapet[index])
                                     ? null
                                     : const Color.fromRGBO(186, 166, 177, 1),
                               ),
@@ -280,7 +284,6 @@ class _ItalianArmenianState extends State<_ItalianArmenian> {
       child: FutureBuilder<List<String>?>(
         future: charctersData,
         builder: (context, snapshot) {
-
           if (snapshot.hasData) {
             var characters = snapshot.data as List<String>;
             return Scaffold(
@@ -320,9 +323,9 @@ class _ItalianArmenianState extends State<_ItalianArmenian> {
                                 fontStyle: FontStyle.normal,
                                 fontWeight: FontWeight.bold,
                                 color: characters
-                                    .toString()
-                                    .toLowerCase()
-                                    .contains(wordsIt[index])
+                                        .toString()
+                                        .toLowerCase()
+                                        .contains(wordsIt[index])
                                     ? null
                                     : const Color.fromRGBO(186, 166, 177, 1),
                               ),

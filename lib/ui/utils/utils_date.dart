@@ -48,5 +48,6 @@ List<DateTime> daysInRange(DateTime first, DateTime last) {
 }
 
 final kToday = DateTime.now();
-final kFirstDay = DateTime(kToday.year, kToday.month - 3, kToday.day).subtract(Duration(days: 1));
+final kFirstDay = DateTime(kToday.year, kToday.month - 3, kToday.day)
+    .subtract(Duration(days: 1));
 final kLastDay = DateTime(2200, 1, kToday.day);

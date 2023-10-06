@@ -15,7 +15,7 @@ import 'package:table_calendar/table_calendar.dart';
 class TableComplexExample extends StatefulWidget {
   final int day;
 
-  const TableComplexExample({Key? key, this.day = 0 }) : super(key: key);
+  const TableComplexExample({Key? key, this.day = 0}) : super(key: key);
   @override
   _TableComplexExampleState createState() => _TableComplexExampleState();
 }
@@ -37,12 +37,10 @@ class _TableComplexExampleState extends State<TableComplexExample> {
   @override
   void initState() {
     super.initState();
-    if(widget.day>0){
-
-     _selectedDays.add(context.read<FocuseDay>().myDate);
+    if (widget.day > 0) {
+      _selectedDays.add(context.read<FocuseDay>().myDate);
     }
     // _selectedDays.add(_focusedDay.value);
-
 
     _selectedEvents = ValueNotifier(_getEventsForDay(_focusedDay.value));
   }
@@ -69,47 +67,43 @@ class _TableComplexExampleState extends State<TableComplexExample> {
   }
 
   void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
- var day = DateTime.now();
-      setState(() {
+    var day = DateTime.now();
+    setState(() {
+      if (focusedDay.isBefore(day)) {
+        if (_selectedDays.contains(selectedDay)) {
+          _selectedDays.remove(selectedDay);
+          Navigator.of(context).pop();
+        } else {
+          _selectedDays.add(selectedDay);
+          Navigator.of(context).pop();
+        }
+        _focusedDay.value = focusedDay;
+        var now = new DateTime(_focusedDay.value.year, _focusedDay.value.month,
+            _focusedDay.value.day);
+        ;
+        // var formatter = new DateFormat('yyyy-MM-dd');
+        var formatter = "${now.year}-${now.month}-${now.day}";
+        print("Im hereeeeeee date $formatter");
+        formattedDate = formatter;
 
-          if(focusedDay.isBefore(day)){
+        context.read<FocuseDay>().setWordsDate(formattedDate);
 
-            if (_selectedDays.contains(selectedDay)) {
-            _selectedDays.remove(selectedDay);
-            Navigator.of(context).pop();
-          } else {
-            _selectedDays.add(selectedDay);
-            Navigator.of(context).pop();
-          }
-            _focusedDay.value = focusedDay;
-            var now = new DateTime(_focusedDay.value.year, _focusedDay.value.month,
-                _focusedDay.value.day);
-            ;
-            // var formatter = new DateFormat('yyyy-MM-dd');
-            var formatter = "${now.year}-${now.month}-${now.day}";
-            print("Im hereeeeeee date $formatter");
-            formattedDate = formatter;
+        context
+            .read<FocuseDay>()
+            .setDays(_focusedDay.value.day.toInt(), focusedDay);
+        _focusedDay.value = focusedDay;
+        // HomePageState.wordsOfDayFuture =
+        //     context.read<FocuseDay>().getDataByDate();
 
-            context.read<FocuseDay>().setWordsDate(formattedDate);
+        _rangeStart = null;
 
-            context.read<FocuseDay>().setDays(_focusedDay.value.day.toInt(),focusedDay);
-            _focusedDay.value = focusedDay;
-            // HomePageState.wordsOfDayFuture =
-            //     context.read<FocuseDay>().getDataByDate();
+        _rangeEnd = null;
 
-            _rangeStart = null;
-
-            _rangeEnd = null;
-
-            _rangeSelectionMode = RangeSelectionMode.toggledOff;            _selectedEvents.value = _getEventsForDays(_selectedDays);
-          }
-          _rangeSelectionMode = RangeSelectionMode.toggledOff;
-      });
-
-
-
-
-
+        _rangeSelectionMode = RangeSelectionMode.toggledOff;
+        _selectedEvents.value = _getEventsForDays(_selectedDays);
+      }
+      _rangeSelectionMode = RangeSelectionMode.toggledOff;
+    });
   }
 
   @override
@@ -120,9 +114,9 @@ class _TableComplexExampleState extends State<TableComplexExample> {
           locale: 'hy_AM',
           firstDay: kFirstDay,
           lastDay: kLastDay,
-          availableGestures:AvailableGestures.none ,
+          availableGestures: AvailableGestures.none,
           focusedDay: _focusedDay.value,
-          selectedDayPredicate: (day) =>   _selectedDays.contains(day),
+          selectedDayPredicate: (day) => _selectedDays.contains(day),
           rangeStartDay: _rangeStart,
           rangeEndDay: DateTime.now(),
           rangeSelectionMode: _rangeSelectionMode,
@@ -137,7 +131,6 @@ class _TableComplexExampleState extends State<TableComplexExample> {
               leftChevronMargin: EdgeInsets.only(left: 50.0),
               rightChevronMargin: EdgeInsets.only(right: 50.0)),
           calendarStyle: const CalendarStyle(
-
             disabledDecoration: BoxDecoration(color: Palette.whenTapedButton),
             markerDecoration: BoxDecoration(color: Palette.whenTapedButton),
             selectedDecoration: BoxDecoration(color: Palette.whenTapedButton),

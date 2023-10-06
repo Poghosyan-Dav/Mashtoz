@@ -11,16 +11,16 @@ class FocuseDay extends ChangeNotifier {
   var _focusDayAuthor = '';
   var _date = DateTime.now();
   int get day => _focusDays;
-  DateTime get myDate =>_date;
+  DateTime get myDate => _date;
   String get wordsDate => _focuseDate;
 
   String get summaryText => _focusDayText;
 
   String get authorText => _focusDayAuthor;
 
-  void setDays(int days,DateTime date) {
+  void setDays(int days, DateTime date) {
     _focusDays = days;
-   _date = date;
+    _date = date;
     notifyListeners();
   }
 
@@ -32,7 +32,7 @@ class FocuseDay extends ChangeNotifier {
   void setWordsDate(String? date) {
     //2022-04-21
     _focuseDate = date ?? '';
-   // getDataByDate();
+    // getDataByDate();
     notifyListeners();
   }
 
@@ -51,5 +51,3 @@ class FocuseDay extends ChangeNotifier {
   //
   // }
 }
-
-

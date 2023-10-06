@@ -23,12 +23,19 @@ class AudioLibraryDataShow extends StatefulWidget {
   final String? adbId;
   final String? firstCharacter;
   final bool? isFromNotifications;
-  const AudioLibraryDataShow({Key? key,this.firstCharacter,this.isFromNotifications, this.adbId, this.dataCharacter})
+  const AudioLibraryDataShow(
+      {Key? key,
+      this.firstCharacter,
+      this.isFromNotifications,
+      this.adbId,
+      this.dataCharacter})
       : super(key: key);
 
   @override
-  State<AudioLibraryDataShow> createState() =>
-      _AudioLibraryDataShowState(dataCharacter: dataCharacter, adbId: adbId,firstCharacter:firstCharacter);
+  State<AudioLibraryDataShow> createState() => _AudioLibraryDataShowState(
+      dataCharacter: dataCharacter,
+      adbId: adbId,
+      firstCharacter: firstCharacter);
 }
 
 class _AudioLibraryDataShowState extends State<AudioLibraryDataShow> {
@@ -40,49 +47,73 @@ class _AudioLibraryDataShowState extends State<AudioLibraryDataShow> {
 
   final userDataProvider = UserDataProvider();
   final bookDataProvider = BookDataProvider();
-  _AudioLibraryDataShowState({this.dataCharacter, this.adbId, this.firstCharacter});
+  _AudioLibraryDataShowState(
+      {this.dataCharacter, this.adbId, this.firstCharacter});
   @override
   void initState() {
     userDataProvider.fetchUserInfo().then((value) => custemerId = value?.id);
-    if (adbId != null && widget.isFromNotifications == true){
-      bookDataProvider
-          .getDialect_Encyclopaedia_Characters(Api.audioLibrariesCharacters)
-          .then((value) {
-        for (var nv in value) {
-          bookDataProvider
-              .getDataByCharacters(Api.audioLibrariesByCharacters(nv))
-              .then((value) {
-            for (var nValue in value) {
-              if ("(${nValue.id})".toString().contains(adbId.toString())) {
-                dataCharacter = nValue;
-                setState(() {});
-                break;
-              }
-            }
-          });
-        }
-      });
-    }else if(adbId != null){
-      bookDataProvider
-          .getDataByCharacters(Api.audioLibrariesByCharacters(firstCharacter)).then((value){
-
-        for (var nValue in value) {
-          if ("(${nValue.id})".toString().contains(adbId.toString())) {
-            dataCharacter = nValue;
-            setState(() {});
-            break;
-          }
-        }
-      });
-    }
+    _findDataCharacterFromPushNotification();
 
     super.initState();
+  }
+
+  Future<void> _findDataCharacterFromPushNotification() async {
+    try {
+      if (adbId != null) {
+        if (widget.isFromNotifications == true) {
+          // Refresh data for BooksScreen and HomePage
+          bookDataProvider.updateBooksAfterPushNotification();
+          bookDataProvider.updateHomeAfterPushNotification(context);
+          // Get a list of characters using audioLibrariesCharacters
+          final characters =
+              await bookDataProvider.getDialect_Encyclopaedia_Characters(
+                  Api.audioLibrariesCharacters);
+
+          // Collect futures to be awaited using Future.wait
+          final futures = <Future>[];
+
+          for (var nv in characters) {
+            futures.add(
+                // Fetch data by characters using audioLibrariesByCharacters
+                bookDataProvider
+                    .getDataByCharacters(Api.audioLibrariesByCharacters(nv))
+                    .then((value) {
+              for (var nValue in value) {
+                if ("(${nValue.id})".toString().contains(adbId.toString())) {
+                  dataCharacter = nValue;
+                  setState(() {});
+                  break;
+                }
+              }
+            }));
+          }
+
+          // Wait for all the futures to complete
+          await Future.wait(futures);
+        } else {
+          // Fetch data by characters using audioLibrariesByCharacters(firstCharacter)
+          final value = await bookDataProvider.getDataByCharacters(
+              Api.audioLibrariesByCharacters(firstCharacter));
+
+          for (var nValue in value) {
+            if ("(${nValue.id})".toString().contains(adbId.toString())) {
+              dataCharacter = nValue;
+              setState(() {});
+              break;
+            }
+          }
+        }
+      }
+    } catch (e) {
+      // Handle any potential errors here
+      print('Error: $e');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context).size;
- print("Ciki${dataCharacter?.video_link}");
+    print("Ciki${dataCharacter?.video_link}");
     return dataCharacter != null
         ? Container(
             // width: mediaQuery.width,
@@ -260,7 +291,8 @@ class _AudioLibraryDataShowState extends State<AudioLibraryDataShow> {
                                   child: Container(
                                       padding: const EdgeInsets.only(
                                           left: 25.0, right: 25.0),
-                                      color: const Color.fromRGBO(246, 246, 246, 1),
+                                      color: const Color.fromRGBO(
+                                          246, 246, 246, 1),
                                       width: double.infinity,
                                       height: 49,
                                       child: Row(
@@ -283,10 +315,7 @@ class _AudioLibraryDataShowState extends State<AudioLibraryDataShow> {
                                           const Spacer(),
                                           InkWell(
                                             onTap: () {
-
-
-                                                userIsSign(context);
-
+                                              userIsSign(context);
                                             },
                                             child: Row(
                                               children: [
@@ -324,7 +353,10 @@ class _AudioLibraryDataShowState extends State<AudioLibraryDataShow> {
                                     alignment: Alignment.topCenter,
                                     child: CachedNetworkImage(
                                       useOldImageOnUrlChange: true,
-                                      imageUrl: YoutubeThumbnail(youtubeId: getIdFromUrl(dataCharacter!.link!)).hd(),
+                                      imageUrl: YoutubeThumbnail(
+                                              youtubeId: getIdFromUrl(
+                                                  dataCharacter!.link!))
+                                          .hd(),
                                       width: double.infinity,
                                       fit: BoxFit.contain,
                                       // height: SizeConfig
@@ -347,7 +379,8 @@ class _AudioLibraryDataShowState extends State<AudioLibraryDataShow> {
                                                 rootNavigator: true)
                                             .push(MaterialPageRoute(
                                                 builder: (_) => VideoView(
-                                                   link: widget.dataCharacter?.link,
+                                                      link: widget
+                                                          .dataCharacter?.link,
                                                     )));
                                       },
                                       child: const Icon(
@@ -393,20 +426,19 @@ class _AudioLibraryDataShowState extends State<AudioLibraryDataShow> {
   }
 
   void userIsSign(BuildContext context) async {
-    final tabProvider = Provider.of<TabProvider>(context,listen: false);
+    final tabProvider = Provider.of<TabProvider>(context, listen: false);
 
-    var data = <String,dynamic>{};
+    var data = <String, dynamic>{};
 
-    await   userDataProvider.fetchUserInfo().then((value) {
-
+    await userDataProvider.fetchUserInfo().then((value) {
       data = <String, dynamic>{
         'type': 'audiolibraries',
         'type_id': dataCharacter?.id,
         'customer_id': value?.id,
       };
     });
-    if(data.isNotEmpty){
-        tabProvider.updateSaveData(data,context);
+    if (data.isNotEmpty) {
+      tabProvider.updateSaveData(data, context);
       if (!isShowingDialog) {
         isShowingDialog = true;
         showDialog(

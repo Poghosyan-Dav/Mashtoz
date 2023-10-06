@@ -32,7 +32,7 @@ class BooksScreen extends StatefulWidget {
   @override
   State<BooksScreen> createState() => _BooksScreenState(
         category: category,
-    isFromHomePage: isFromHomePage,
+        isFromHomePage: isFromHomePage,
       );
 }
 
@@ -48,15 +48,25 @@ class _BooksScreenState extends State<BooksScreen> {
 
   @override
   void initState() {
-    contentFuture = bookDataProvider.getLibraryBooksByCategory(category?.id ?? 0);
+    contentFuture =
+        bookDataProvider.getLibraryBooksByCategory(category!.id!, false);
     super.initState();
   }
+  //Inchlue in Refresh indicator
+
+  // Future<void> _refreshData() async {
+  //   final List<dynamic>? newData =
+  //   await bookDataProvider.getLibraryBooksByCategory(category!.id!, true);
+  //
+  //   if (mounted) {
+  //     setState(() {
+  //       contentFuture = Future<List<dynamic>?>.value(newData);
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
-    final orentation = MediaQuery.of(context).size.width;
-    print(orentation);
-
     return WillPopScope(
       onWillPop: () async {
         context
@@ -65,120 +75,134 @@ class _BooksScreenState extends State<BooksScreen> {
 
         return true;
       },
-      child: ConnectivityBuilder(
-        builder: (context,isConnect,state){
-          if(isConnect == true){
-            return Scaffold(
-              extendBodyBehindAppBar: true,
-              backgroundColor: Palette.textLineOrBackGroundColor,
-              body: CustomScrollView(
-                slivers: [
-                  SliverAppBar(
-                    centerTitle: false,
-                    title: Transform(
-                      transform: Matrix4.translationValues(-20.0, 0.0, 0.0),
-                      child: Text(
-                        '${category?.categoryTitle}',
-                        style: TextStyle(
-                          fontSize: 16,
-                          letterSpacing: 1,
-                          fontFamily: 'GHEAGrapalat',
-                          fontWeight: FontWeight.w700,
-                          color: Palette.appBarTitleColor,
-                        ),
+      child: ConnectivityBuilder(builder: (context, isConnect, state) {
+        if (isConnect == true) {
+          return Scaffold(
+            extendBodyBehindAppBar: true,
+            backgroundColor: Palette.textLineOrBackGroundColor,
+            body: CustomScrollView(
+              slivers: [
+                SliverAppBar(
+                  centerTitle: false,
+                  title: Transform(
+                    transform: Matrix4.translationValues(-20.0, 0.0, 0.0),
+                    child: Text(
+                      '${category?.categoryTitle}',
+                      style: TextStyle(
+                        fontSize: 16,
+                        letterSpacing: 1,
+                        fontFamily: 'GHEAGrapalat',
+                        fontWeight: FontWeight.w700,
+                        color: Palette.appBarTitleColor,
                       ),
-                    ),
-                    leading: SizedBox(
-                      width: 8,
-                      height: 14,
-                      child: IconButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          context
-                              .read<BottomColorNotifire>()
-                              .setColor(Palette.libraryBacgroundColor);
-                        },
-                        icon: Icon(
-                          Icons.arrow_back_ios_new_outlined,
-                          color: Palette.appBarTitleColor,
-                        ),
-                      ),
-                    ),
-                    expandedHeight: 73,
-                    backgroundColor: Palette.textLineOrBackGroundColor,
-                    elevation: 0,
-                    automaticallyImplyLeading: false,
-                    systemOverlayStyle: SystemUiOverlayStyle(
-                        statusBarColor: Color.fromRGBO(25, 4, 18, 1)),
-                    actions: [
-                      Padding(
-                        padding: const EdgeInsets.only(right: 20.0),
-                        child: MenuShow(),
-                      ),
-                    ],
-                  ),
-                  SliverFillRemaining(
-                    child: FutureBuilder<List<dynamic>?>(
-                      future: contentFuture,
-                      builder: ((context, snapshot) {
-                        List? conentList ;
-
-                        if (snapshot.hasData) {
-                          conentList = snapshot.data ;
-                          return   conentList!.isNotEmpty?  ResponsiveGridList(
-                            horizontalGridSpacing:
-                            16, // Horizontal space between grid items
-
-                            verticalGridMargin: 50, // Vertical space around the grid
-                            minItemWidth:
-                            388, // The minimum item width (can be smaller, if the layout constraints are smaller)
-                            minItemsPerRow:
-                            1, // The minimum items to show in a single row. Takes precedence over minItemWidth
-                            maxItemsPerRow: 4, // The m
-                            children: List.generate(snapshot.data!.length, (index) {
-                              Content book = conentList![index];
-                              return index % 2 != 0
-                                  ? Transform(
-                                  alignment: Alignment.center,
-                                  transform: Matrix4.rotationY(math.pi),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(15.0),
-                                    child: BookCard(
-                                      isFromHomePage: isFromHomePage,
-                                      isOdd: true,
-                                      book: book,
-                                      categorys: category!,
-                                    ),
-                                  ))
-                                  : Padding(
-                                padding: const EdgeInsets.all(15.0),
-                                child: BookCard(
-                                  isOdd: false,
-                                  book: book,
-                                  isFromHomePage: isFromHomePage,
-                                  categorys: category!,
-                                ),
-                              );
-                            }),
-                          ) :Center(child: Text('Բովանդակությունը բացակայում է',style: TextStyle(color: Palette.appBarTitleColor))); ;;
-                        }
-                        return  Container(
-                            child: Center(
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.0,
-                                  color: Palette.main,
-                                )));
-                      }),
                     ),
                   ),
-                ],
+                  leading: SizedBox(
+                    width: 8,
+                    height: 14,
+                    child: IconButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        context
+                            .read<BottomColorNotifire>()
+                            .setColor(Palette.libraryBacgroundColor);
+                      },
+                      icon: Icon(
+                        Icons.arrow_back_ios_new_outlined,
+                        color: Palette.appBarTitleColor,
+                      ),
+                    ),
+                  ),
+                  expandedHeight: 73,
+                  backgroundColor: Palette.textLineOrBackGroundColor,
+                  elevation: 0,
+                  automaticallyImplyLeading: false,
+                  systemOverlayStyle: SystemUiOverlayStyle(
+                      statusBarColor: Color.fromRGBO(25, 4, 18, 1)),
+                  actions: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 20.0),
+                      child: MenuShow(),
+                    ),
+                  ],
+                ),
+                SliverFillRemaining(
+                  child: FutureBuilder<List<dynamic>?>(
+                    future: contentFuture,
+                    builder: ((context, snapshot) {
+                      List? conentList;
+
+                      if (snapshot.hasData) {
+                        conentList = snapshot.data;
+                        return conentList!.isNotEmpty
+                            ? ResponsiveGridList(
+                                horizontalGridSpacing:
+                                    16, // Horizontal space between grid items
+
+                                verticalGridMargin:
+                                    50, // Vertical space around the grid
+                                minItemWidth:
+                                    388, // The minimum item width (can be smaller, if the layout constraints are smaller)
+                                minItemsPerRow:
+                                    1, // The minimum items to show in a single row. Takes precedence over minItemWidth
+                                maxItemsPerRow: 4, // The m
+                                children: List.generate(snapshot.data!.length,
+                                    (index) {
+                                  Content book = conentList![index];
+                                  return index % 2 != 0
+                                      ? Transform(
+                                          alignment: Alignment.center,
+                                          transform: Matrix4.rotationY(math.pi),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(15.0),
+                                            child: BookCard(
+                                              isFromHomePage: isFromHomePage,
+                                              isOdd: true,
+                                              book: book,
+                                              categorys: category!,
+                                            ),
+                                          ))
+                                      : Padding(
+                                          padding: const EdgeInsets.all(15.0),
+                                          child: BookCard(
+                                            isOdd: false,
+                                            book: book,
+                                            isFromHomePage: isFromHomePage,
+                                            categorys: category!,
+                                          ),
+                                        );
+                                }),
+                              )
+                            : Center(
+                                child: Text('Բովանդակությունը բացակայում է',
+                                    style: TextStyle(
+                                        color: Palette.appBarTitleColor)));
+                        ;
+                        ;
+                      }
+                      return Container(
+                          child: Center(
+                              child: CircularProgressIndicator(
+                        strokeWidth: 2.0,
+                        color: Palette.main,
+                      )));
+                    }),
+                  ),
+                ),
+              ],
+            ),
+          );
+        } else {
+          return Center(
+            child: Center(
+              child: Text(
+                'Միացրեք ինտերնետը ',
+                style: TextStyle(color: Palette.appBarTitleColor),
               ),
-            );
-          }else {
-             return Center(child: Center(child:  Text('Միացրեք ինտերնետը ',style: TextStyle(color: Palette.appBarTitleColor),),),);
-          }
+            ),
+          );
         }
-      ),
+      }),
     );
   }
 }
@@ -204,21 +228,26 @@ class BookCard extends StatelessWidget {
     return Center(
       child: GestureDetector(
         onTap: () {
-          Navigator.of(context,rootNavigator: true ).push(
+          Navigator.of(context, rootNavigator: true).push(
             MaterialPageRoute(
-              builder: (_) => isFromHomePage ==true?BookInitalScreen(
-                isFromHomaPage: isFromHomePage,
-                book: null,
-                idLib: bookId,
-              ):BookInitalScreen(
-                book: isFromAccoungel == true? null : book,
-                category: categorys,
-                idLib: bookId,
-              ),
+              builder: (_) => isFromHomePage == true
+                  ? BookInitalScreen(
+                      isFromHomaPage: isFromHomePage,
+                      book: null,
+                      idLib: bookId.toString(),
+                      categoryID: '',
+                    )
+                  : BookInitalScreen(
+                      book: isFromAccoungel == true ? null : book,
+                      category: categorys,
+                      idLib: bookId.toString(),
+                      categoryID: '',
+                    ),
             ),
           );
 
-          context.read<ContentProvider>().getContentList(book);},
+          context.read<ContentProvider>().getContentList(book);
+        },
         child: Container(
           //color: Colors.black,
           width: SizeConfig.screenWidth! <= 360 ? 320 : 388,
@@ -296,11 +325,13 @@ class BookCard extends StatelessWidget {
                             child: CachedNetworkImage(
                               imageUrl: book.image!,
                               fit: BoxFit.cover,
+                              errorWidget: (context, url, error) => Icon(Icons.error),
                             ),
                           )
                         : CachedNetworkImage(
                             imageUrl: book.image!,
                             fit: BoxFit.cover,
+                            errorWidget: (context, url, error) => Icon(Icons.error),
                           ),
                   )),
               Positioned.fill(
@@ -446,6 +477,7 @@ class BookCard extends StatelessWidget {
               ),
             ],
           ),
+
           // child: Stack(
           //   children: <Widget>[
           //     Positioned(

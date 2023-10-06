@@ -13,7 +13,7 @@ import 'books_page.dart';
 
 class LibraryPage extends StatefulWidget {
   final bool? isFromHomePage;
-  const  LibraryPage({
+  const LibraryPage({
     Key? key,
     this.isFromHomePage,
   }) : super(key: key);
@@ -29,7 +29,8 @@ class _LibraryPageState extends State<LibraryPage> {
 
   @override
   void initState() {
-    categoryFutureList = bookDataProvider.getCategoryLists(Api.categoryListUrl,false);
+    categoryFutureList =
+        bookDataProvider.getCategoryLists(Api.categoryListUrl, false);
 
     super.initState();
   }
@@ -38,42 +39,12 @@ class _LibraryPageState extends State<LibraryPage> {
   Widget build(BuildContext context) {
     return Theme(
       data: ThemeData(
-          textSelectionTheme:
-              TextSelectionThemeData(cursorColor: Colors.amber)),
+        textSelectionTheme: TextSelectionThemeData(cursorColor: Colors.amber),
+      ),
       child: Scaffold(
         backgroundColor: Palette.libraryBacgroundColor,
         extendBodyBehindAppBar: true,
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(73),
-          child: AppBar(
-            systemOverlayStyle: const SystemUiOverlayStyle(
-              statusBarColor: Color.fromRGBO(25, 4, 18, 1),
-            ),
-            elevation: 0,
-
-             leading: widget.isFromHomePage == true || isWhichPlatform ? IconButton(onPressed: ()=>Navigator.of(context).pop(), icon: Icon(Icons.arrow_back_ios_new_outlined),color: Colors.white,):null,
-            leadingWidth: isWhichPlatform ? 20 : null,
-            title: Text(
-              'Գրադարան',
-              style: TextStyle(
-                  fontFamily: 'GHEAGrapalat',
-                  fontSize: 18,
-                  letterSpacing: 1.5,
-                  fontWeight: FontWeight.bold,
-                  color: Palette.textLineOrBackGroundColor),
-            ),
-            automaticallyImplyLeading:  false,
-            backgroundColor: Palette.barColor,
-            actions: [
-              Padding(
-                padding: const EdgeInsets.only(
-                  right: 20.0,
-                ),
-                child: MenuShow(),
-              )
-            ],
-          ),
-        ),
+        appBar: buildAppBar(context),
         body: Padding(
           padding: const EdgeInsets.only(right: 16.0),
           child: FutureBuilder<List<BookCategory>>(
@@ -85,74 +56,102 @@ class _LibraryPageState extends State<LibraryPage> {
                   children: [
                     Expanded(
                       child: RawScrollbar(
-                          thumbColor: Palette.whenTapedButton,
-                          thickness: 3,
-                          radius: const Radius.circular(12),
-                          isAlwaysShown: true,
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            scrollDirection: Axis.vertical,
-                            itemCount: categoryList!.length,
-                            itemBuilder: (context, index) {
-                              return Container(
-                                height: 50,
-                                width: MediaQuery.of(context).size.width,
-                                padding: const EdgeInsets.only(right: 32),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      isColorAvtive = !isColorAvtive;
-
-                                      ;
-                                    });
-                                    context
-                                        .read<BottomColorNotifire>()
-                                        .setColor(
-                                            Palette.textLineOrBackGroundColor);
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => BooksScreen(
-                                          isFromHomePage: widget.isFromHomePage,
-                                          category: categoryList[index],
-                                        ),
-                                      ),
+                        thumbColor: Palette.whenTapedButton,
+                        thickness: 3,
+                        radius: const Radius.circular(12),
+                        thumbVisibility: true,
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          scrollDirection: Axis.vertical,
+                          itemCount: categoryList?.length,
+                          itemBuilder: (context, index) {
+                            return ListTile(
+                              onTap: () {
+                                setState(() {
+                                  isColorAvtive = !isColorAvtive;
+                                });
+                                context.read<BottomColorNotifire>().setColor(
+                                      Palette.textLineOrBackGroundColor,
                                     );
-                                  },
-                                  child: Align(
-                                    alignment: Alignment.centerRight,
-                                    child: Text(
-                                      '${categoryList[index].categoryTitle}',
-                                      style: TextStyle(
-                                        color:
-                                            Palette.textLineOrBackGroundColor,
-                                        fontSize: 12,
-                                        fontFamily: 'GHEAGrapalat',
-                                        fontWeight: FontWeight.w400,
-                                        letterSpacing: 1,
-                                      ),
-                                      textAlign: TextAlign.right,
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => BooksScreen(
+                                      isFromHomePage: widget.isFromHomePage,
+                                      category: categoryList![index],
                                     ),
                                   ),
+                                );
+                              },
+                              title: Align(
+                                alignment: Alignment.centerRight,
+                                child: Text(
+                                  '${categoryList?[index].categoryTitle}',
+                                  style: TextStyle(
+                                    color: Palette.textLineOrBackGroundColor,
+                                    fontSize: 12,
+                                    fontFamily: 'GHEAGrapalat',
+                                    fontWeight: FontWeight.w400,
+                                    letterSpacing: 1,
+                                  ),
+                                  textAlign: TextAlign.right,
                                 ),
-                              );
-                            },
-                          )),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
                     ),
                   ],
                 );
               }
-              return Container(
-                child: Center(
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.0,
-                    color: Palette.main,
-                  ),
+              return Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.0,
+                  color: Palette.main,
                 ),
               );
             },
           ),
         ),
+      ),
+    );
+  }
+
+  PreferredSizeWidget buildAppBar(BuildContext context) {
+    return PreferredSize(
+      preferredSize: const Size.fromHeight(73),
+      child: AppBar(
+        systemOverlayStyle: const SystemUiOverlayStyle(
+          statusBarColor: Color.fromRGBO(25, 4, 18, 1),
+        ),
+        elevation: 0,
+        leading: widget.isFromHomePage == true || isWhichPlatform
+            ? IconButton(
+                onPressed: () => Navigator.of(context).pop(),
+                icon: Icon(Icons.arrow_back_ios_new_outlined),
+                color: Colors.white,
+              )
+            : null,
+        leadingWidth: isWhichPlatform ? 20 : null,
+        title: Text(
+          'Գրադարան',
+          style: TextStyle(
+            fontFamily: 'GHEAGrapalat',
+            fontSize: 18,
+            letterSpacing: 1.5,
+            fontWeight: FontWeight.bold,
+            color: Palette.textLineOrBackGroundColor,
+          ),
+        ),
+        automaticallyImplyLeading: false,
+        backgroundColor: Palette.barColor,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 20.0),
+            child: MenuShow(),
+          ),
+        ],
       ),
     );
   }

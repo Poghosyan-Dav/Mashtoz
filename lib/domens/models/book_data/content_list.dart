@@ -1,20 +1,4 @@
 class Content {
-  Content({
-    required this.id,
-    required this.title,
-    required this.image,
-    required this.body,
-    required this.videoLink,
-    required this.explanation,
-    required this.author,
-    required this.content,
-    required this.sharurl,
-    this.number,
-    this.first_character,
-    this.summary,
-    this.link,
-  });
-
   final int? id;
   final String? title;
   final String? image;
@@ -30,28 +14,59 @@ class Content {
 
   final Map<String, Content>? content;
 
-  factory Content.fromJson(Map<dynamic, dynamic> json) {
-    return Content(
-      id: json["id"] == null ? null : json["id"],
-      title: json["title"] == null ? null : json["title"],
-      image: json["image"] == null ? null : json["image"],
-      body: json["body"] == null ? null : json["body"],
-      videoLink: json["video_link"] == null ? null : json["video_link"],
-      link: json["link"] == null ? null : json["link"],
-      explanation: json["explanation"] == null ? null : json["explanation"],
-      author: json["author"] == null ? null : json["author"],
-      number: json['number'] == null ? null : json['number'],
-      first_character:
-          json['first_character'] == null ? null : json['first_character'],
-      summary: json['summary'] == null ? null : json['summary'],
-      sharurl: json['sharurl'] == null ? null : json['sharurl'],
-      content: json['content'] == null
-          ? null
-          : Map.from(json['content'])
-              .map((key, value) => MapEntry(key, Content.fromJson(value))),
+  Content({
+    this.id,
+    this.title,
+    this.image,
+    this.body,
+    this.videoLink,
+    this.link,
+    this.explanation,
+    this.author,
+    this.number,
+    this.summary,
+    this.first_character,
+    this.sharurl,
+    this.content,
+  });
 
-    );
-  }
+  factory Content.fromJson(Map<String, dynamic> json) => Content(
+        id: json["id"],
+        title: json["title"],
+        image: json["image"],
+        body: json["body"],
+        videoLink: json["video_link"],
+        link: json["link"],
+        explanation: json["explanation"],
+        author: json["author"],
+        number: json['number'],
+        first_character: json['first_character'],
+        summary: json['summary'],
+        sharurl: json['sharurl'],
+        content: json['content'] == null
+            ? {}
+            : Map<String, dynamic>.from(json['content'])
+                .map((key, value) => MapEntry(key, Content.fromJson(value))),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "title": title,
+        "image": image,
+        "body": body,
+        "video_link": videoLink,
+        "link": link,
+        "explanation": explanation,
+        "author": author,
+        "number": number,
+        "first_character": first_character,
+        "summary": summary,
+        "sharurl": sharurl,
+        "content": content == null
+            ? null
+            : Map.from(content!)
+                .map((key, value) => MapEntry(key, value.toJson())),
+      };
 }
 
 class UserAccount {
@@ -69,8 +84,8 @@ class UserAccount {
     return UserAccount(
       type: json['type'],
       type_id: json['type_id'],
-      content: json['content'] != null ? Content.fromJson(json['content']) : null,
+      content:
+          json['content'] != null ? Content.fromJson(json['content']) : null,
     );
   }
-
 }

@@ -25,7 +25,6 @@ class InfoDataProvider {
         data = Data.fromJson(jsonDecode(response.body)['data']);
         inspect(data);
         // return (data as List).map((e) => Data.fromJson(e)).toList();
-
       } else {
         print("failed");
       }

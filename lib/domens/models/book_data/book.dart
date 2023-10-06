@@ -32,7 +32,6 @@ class Book {
 }
 // class Book {
 
-
 class IalianLesson {
   final int id;
   final String title;
@@ -47,7 +46,6 @@ class IalianLesson {
     required this.link,
   });
 }
-
 
 class GalleryExampleItemThumbnail extends StatelessWidget {
   const GalleryExampleItemThumbnail({
@@ -67,9 +65,11 @@ class GalleryExampleItemThumbnail extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Hero(
-          
           tag: galleryExampleItem.id.toString(),
-          child: CachedNetworkImage(imageUrl: galleryExampleItem.image!,height: 80,),
+          child: CachedNetworkImage(
+            imageUrl: galleryExampleItem.image!,
+            height: 80,
+          ),
         ),
       ),
     );

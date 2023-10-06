@@ -1,23 +1,74 @@
 import 'dart:convert';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:mashtoz_flutter/ui/widgets/main_page/home_screen.dart';
 import 'package:mashtoz_flutter/ui/widgets/main_page/library_pages/book_page.dart';
 import 'package:mashtoz_flutter/ui/widgets/main_page/library_pages/book_read_screen.dart';
-import 'package:mashtoz_flutter/ui/widgets/main_page/main_menu_pages/audio_library/audio_librar_data_show.dart';
-import 'package:mashtoz_flutter/ui/widgets/main_page/main_menu_pages/dialect/dialect.dart';
-import 'package:mashtoz_flutter/ui/widgets/main_page/main_menu_pages/italian_lesson/italian_data_show.dart';
 import 'package:rxdart/subjects.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest.dart' as tz;
+
+import '../../../domens/blocs/update_home_bloc.dart';
+import '../../../domens/blocs/update_home_event.dart';
+import '../../../firebase_options.dart';
 
 final BehaviorSubject<String?> selectNotificationSubject =
     BehaviorSubject<String?>();
 
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(
+  RemoteMessage message,
+) async {
+  print("Handling a background message: ${message.messageId}");
+
+  // Save the message to local storage (shared_preferences)
+  final prefs = await SharedPreferences.getInstance();
+
+  final messagesKey = 'push_messages';
+
+
+  List<String>? savedMessages = prefs.getStringList(messagesKey);
+  if(savedMessages !=null )await prefs.remove(messagesKey);
+  savedMessages ??= [];
+
+  savedMessages.add(message.data['route'].toString()); // You can customize how you save the message data here
+
+  await prefs.setStringList(messagesKey, savedMessages);
+
+  // You can add additional logic to handle the notification or perform other tasks here.
+
+  //
   print(' --- background message received ---');
   print(message.notification!.title);
-  print(message.notification!.body);
+  print('im here fuck');
+  // Setting the context
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  // const InitializationSettings initializationSettings =
+  // InitializationSettings(
+  //     android: AndroidInitializationSettings("@mipmap/ic_launcher_foreground"));
+  // final notification = FlutterLocalNotificationsPlugin();
+  // await notification.show(
+  //   0,
+  //   message.notification!.title ?? 'Notification',
+  //   message.notification!.body ?? '',
+  //   const NotificationDetails(
+  //     android: AndroidNotificationDetails(
+  //       'mashtoz',
+  //       'mashtoz',
+  //
+  //       priority: Priority.high,
+  //       importance: Importance.max,
+  //     ),
+  //   ),
+  //   payload: message.data['route'], // Example payload
+  // );
+// Accessing the context
 }
 
 class NotificationService {
@@ -36,52 +87,67 @@ class NotificationService {
   static final NotificationService _notificationService =
       NotificationService._internal();
 
-  static void initialize(BuildContext context) async {
+  static void initialize(BuildContext? context) async {
     const InitializationSettings initializationSettings =
         InitializationSettings(
-            android: AndroidInitializationSettings("@mipmap/ic_launcher_foreground"));
+            android: AndroidInitializationSettings(
+                "@mipmap/ic_launcher_foreground"));
 
     flutterLocalNotificationsPlugin.initialize(initializationSettings,
-
         onSelectNotification: (String? route) async {
-      if (route != null) {
+      if (route != null && context != null) {
+        final MyBloc bloc = BlocProvider.of<MyBloc>(context);
+        bloc.add(const UpdateScreenEvent(true));
         Map<String, dynamic> noteData = jsonDecode(route);
-        String id = noteData.values.toString();
-        print('Notif Dataaaaaaaaa $id');
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (_) => ItaliaLessonShow(
-              idLessons: id,
-            )));
-        if (route.contains('lessons')) {
+        //   if (noteData.containsKey('lessons')) {
+        //   Navigator.of(context).push(MaterialPageRoute(
+        //       builder: (_) =>
+        //           ItaliaLessonShow(
+        //             idLessons:noteData['lessons'],
+        //           )));
+        // }
+        if (noteData.containsKey('libraries') &&
+            noteData['libraries'].toString().isNotEmpty) {
+          print(
+              'noteData libraries : ${noteData["libraries"]} : ${noteData["categoryID"]}');
+          var librariesId = noteData["libraries"].toString();
+          var cateroyId = noteData["categoryID"].toString();
           Navigator.of(context).push(MaterialPageRoute(
-              builder: (_) => ItaliaLessonShow(
-                    idLessons: id,
+              builder: (_) => BookInitalScreen(
+                    idLib: librariesId,
+                    categoryID: cateroyId,
                   )));
-        } else if (route.contains('libraries')) {
-          Navigator.of(context)
-              .push(MaterialPageRoute(builder: (_) => BookInitalScreen(
-
-            idLib: int.tryParse(id),
-          )));
-        } else if (route.contains('encyclopedias')) {
+        } else if (noteData.containsKey('libraries') &&
+            noteData['subld'].toString().isNotEmpty != null) {
+          var subID = noteData["subld"].toString();
+          var cateroyId = noteData["categoryID"].toString();
           Navigator.of(context).push(MaterialPageRoute(
               builder: (_) => BookReadScreen(
-                    encyId: id,
+                    idLib: subID,
+                    categoryId: cateroyId,
                   )));
-        } else if (route.contains('audiolibraries')) {
+        } else if (noteData.containsKey('encyclopedias')) {
+          var encyclopediasId = noteData["encyclopedias"].toString();
+          var character = noteData["character"].toString();
+          print('noteData encyclopedias : $encyclopediasId $character');
+
           Navigator.of(context).push(MaterialPageRoute(
-              builder: (_) => AudioLibraryDataShow(
-                    adbId: id,
+              builder: (_) => BookReadScreen(
+                    encyId: encyclopediasId,
+                    character: character,
                   )));
+        } else if (noteData.containsKey('audiolibraries')) {
+          // Navigator.of(context).push(MaterialPageRoute(
+          //     builder: (_) => AudioLibraryDataShow(
+          //       adbId: noteData['audiolibraries'] ,
+          //       isFromNotifications: true,
+          //     )));
         } else {
           Navigator.of(context)
-              .push(MaterialPageRoute(builder: (_) => const Dialect()));
+              .push(MaterialPageRoute(builder: (_) => const HomeScreen()));
         }
-
-        Navigator.of(context).pushNamed(route);
       }
-    }
-    );
+    });
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
     tz.initializeTimeZones();
@@ -92,11 +158,11 @@ class NotificationService {
       final id = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
       const NotificationDetails notificationDetails = NotificationDetails(
-      //  iOS: IOSNotificationDetails(subtitle:"Mashtoz",sound: "true"),
+          //  iOS: IOSNotificationDetails(subtitle:"Mashtoz",sound: "true"),
           android: AndroidNotificationDetails(
         'mashtoz',
         'mashtoz',
-        icon:'@mipmap/ic_launcher',
+        icon: '@mipmap/ic_launcher_foreground',
         channelDescription: 'this is our channel',
         importance: Importance.high,
         priority: Priority.high,
@@ -112,16 +178,5 @@ class NotificationService {
     } on Exception catch (e) {
       print(e);
     }
-  }
-}
-
-class SecondScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: Center(
-        child: Text('data'),
-      ),
-    );
   }
 }
