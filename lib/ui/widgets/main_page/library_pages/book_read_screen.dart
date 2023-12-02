@@ -221,7 +221,6 @@ class _BookReadScreenState extends State<BookReadScreen> {
     return await searchBookProvider.fetchBook(
         type: searchData?.type, id: searchData?.id);
   }
-
   @override
   Widget build(BuildContext context) {
     return searchData != null
@@ -1338,7 +1337,7 @@ class _BookPagesState extends State<BookPages> {
                 padding: EdgeInsets.only(left: 16.0, right: 16.0),
                 width: MediaQuery.of(context).size.width,
                 child: HtmlWidget(
-                  listText,
+                  "$listText",
                   onTapUrl: (url) => _openUrl(url),
                 ),
               ),

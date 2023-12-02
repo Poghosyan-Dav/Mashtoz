@@ -725,7 +725,7 @@ class BookDataProvider {
       // We can execute these three tasks concurrently using Future.wait
       await Future.wait([
         getDataByCharactersForHome(
-            Api.encyclopediasByCharacters(value.encyclopedias?.first)),
+            Api.encyclopediasByCharacters(value.encyclopedias)),
         getDataByCharactersForHome(
             Api.dialectBYCharacters(value.dialects?.first)),
         getDataByCharactersForHome(

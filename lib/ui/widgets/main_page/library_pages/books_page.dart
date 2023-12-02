@@ -18,6 +18,7 @@ import '../../../../domens/models/bottom_bar_color_notifire.dart';
 import '../../helper_widgets/menuShow.dart';
 import 'book_inherited_widget.dart';
 import 'book_page.dart';
+import 'book_read_screen.dart';
 
 class BooksScreen extends StatefulWidget {
   final bool? isFromHomePage;
@@ -232,17 +233,19 @@ class BookCard extends StatelessWidget {
             MaterialPageRoute(
               builder: (_) => isFromHomePage == true
                   ? BookInitalScreen(
-                      isFromHomaPage: isFromHomePage,
-                      book: null,
-                      idLib: bookId.toString(),
-                      categoryID: '',
-                    )
-                  : BookInitalScreen(
-                      book: isFromAccoungel == true ? null : book,
-                      category: categorys,
-                      idLib: bookId.toString(),
-                      categoryID: '',
-                    ),
+                isFromHomaPage: isFromHomePage,
+                book: null,
+                idLib: bookId.toString(),
+                categoryID: '',
+              )
+                  : book.content?.length == 0 ||(book.content?.length == 0 && isFromHomePage == true) ? BookReadScreen(
+                readScreen: book!,
+              ) :BookInitalScreen(
+                book: isFromAccoungel == true ? null : book,
+                category: categorys,
+                idLib: bookId.toString(),
+                categoryID: '',
+              ),
             ),
           );
 

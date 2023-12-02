@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:mashtoz_flutter/config/palette.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
 class VideoView extends StatefulWidget {
   final String link;
@@ -11,37 +11,11 @@ class VideoView extends StatefulWidget {
 }
 
 class _VideoViewState extends State<VideoView> {
-  late final WebViewController _controller;
 
   bool isLoading = false;
 
   @override
   void initState() {
-    // late final PlatformWebViewControllerCreationParams params;
-    // if (WebViewPlatform.instance is WebKitWebViewPlatform) {
-    //   params = WebKitWebViewControllerCreationParams(
-    //     allowsInlineMediaPlayback: true,
-    //     mediaTypesRequiringUserAction: const <PlaybackMediaTypes>{},
-    //   );
-    // } else {
-    //   params = const PlatformWebViewControllerCreationParams();
-    // }
-    // final WebViewController controller =
-    // WebViewController.fromPlatformCreationParams(params);
-    // controller
-    //   ..setJavaScriptMode(JavaScriptMode.unrestricted)
-    //   ..loadRequest(
-    //   Uri.parse('${widget.link}'),
-    // );
-    //
-    // // #docregion platform_features
-    // if (controller.platform is AndroidWebViewController) {
-    //   AndroidWebViewController.enableDebugging(true);
-    //   (controller.platform as AndroidWebViewController)
-    //       .setMediaPlaybackRequiresUserGesture(false);
-    // }
-    // #enddocregion platform_features
-
     super.initState();
     makeLoading();
   }
@@ -79,12 +53,8 @@ class _VideoViewState extends State<VideoView> {
                 )
               : Container(
                   color: Colors.black,
-                  child: WebView(
-                    initialUrl: widget.link,
-                    javascriptMode: JavascriptMode.unrestricted,
-                    onWebViewCreated: (controller) {
-                      _controller = controller;
-                    },
+                  child:  InAppWebView(initialUrlRequest:
+                  URLRequest(url: Uri.parse(widget.link))
                   ),
                 ),
         ));

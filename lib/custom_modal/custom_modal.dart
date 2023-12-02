@@ -17,7 +17,7 @@ Widget _buildMaterialDialogTransitions(
 Future<Object?> showNewDialog<T>({
   required BuildContext context,
   bool barrierDismissible = true,
-  hideBottomSafeArea: false,
+  hideBottomSafeArea= false,
   @Deprecated(
       'Instead of using the "child" argument, return the child from a closure '
       'provided to the "builder" argument. This will ensure that the BuildContext '

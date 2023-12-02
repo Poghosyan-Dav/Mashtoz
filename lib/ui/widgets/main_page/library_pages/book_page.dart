@@ -79,10 +79,22 @@ class _BookInitalScreenState extends State<BookInitalScreen> {
         bookDataProvider.getLibraryBooksByCategory(nv.id!, false).then((value) {
           for (var nValue in value!) {
             if (nValue.id == int.parse('$idLib')) {
-              print(nValue.id);
-              book = nValue;
-              setState(() {});
-              break;
+              if(nValue.content?.length == 0){
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => BookReadScreen(readScreen: nValue,)),
+                     // Replace this with your condition
+                ).then((_) {
+                  Navigator.of(context).pop();
+                });
+
+                break;
+              }else{
+                print(nValue.id);
+                book = nValue;
+                setState(() {});
+                break;
+              }
+
             }
           }
         });
@@ -106,7 +118,8 @@ class _BookInitalScreenState extends State<BookInitalScreen> {
         }
       });
     }else{
-      findBook();
+      if(idLib != 'null') findBook();
+
     }
     final prefs = await SharedPreferences.getInstance();
     final messagesKey = 'push_messages';
@@ -130,11 +143,14 @@ class _BookInitalScreenState extends State<BookInitalScreen> {
           .getLibraryBooksByCategory(int.parse('$ctgId' ), true)
           .then((value) {
         for (var nValue in value!) {
-          if (nValue.id == int.parse('$idLib')) {
-            book = nValue;
-            setState(() {});
-            break;
+          if(idLib != 'null'){
+            if (nValue.id == int.parse('$idLib')) {
+              book = nValue;
+              setState(() {});
+              break;
+            }
           }
+
         }
       });
     }else{
@@ -145,11 +161,12 @@ class _BookInitalScreenState extends State<BookInitalScreen> {
         for (var nv in value) {
           bookDataProvider.getLibraryBooksByCategory(nv.id!, true).then((value) {
             for (var nValue in value!) {
-              if (nValue.id == int.parse('$idLib')) {
-                print(nValue.id);
-                book = nValue;
-                setState(() {});
-                break;
+              if(idLib != 'null'){
+                if (nValue.id == int.parse('$idLib')) {
+                  book = nValue;
+                  setState(() {});
+                  break;
+                }
               }
             }
           });

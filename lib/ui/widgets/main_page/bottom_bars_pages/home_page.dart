@@ -58,7 +58,7 @@ class _HomePageState extends State<HomePage> {
   int? bookCategoryid;
   Content? libraries;
   List<Lessons>? lessons;
-  List<String>? encyclopedias;
+  Map<String,dynamic>? encyclopedias;
   String? audiolibraries;
   List<String>? dialects;
   Users? _users;
@@ -89,7 +89,7 @@ class _HomePageState extends State<HomePage> {
     });
    //wordsOfDayFuture = _bookDataProvider.getWordsOfDay();
 
-    _fetchHomeData(true);
+    _fetchHomeData(false);
 
     _scrollController.addListener(() {
       if (_scrollController.position.userScrollDirection ==
@@ -129,13 +129,14 @@ class _HomePageState extends State<HomePage> {
 
       audiolibraries = value.audiolibraries;
       encyclopedias = value.encyclopedias;
+      charTitle = value.encyclopedias!.keys.first;
       lessons = value.lessons;
       libraries = value.libraries;
       dialects = value.dialects;
 
       _bookDataProvider
           .getDataByCharactersForHome(
-              Api.encyclopediasByCharacters(value.encyclopedias?.first))
+              Api.encyclopediasByCharacters(value.encyclopedias?.keys.first))
           .then((value) {
         setState(() {
           e = value;
@@ -1074,9 +1075,9 @@ class _HomePageState extends State<HomePage> {
                                                                                   scrollDirection: Axis.horizontal,
                                                                                   physics: const NeverScrollableScrollPhysics(),
                                                                                   shrinkWrap: true,
-                                                                                  itemCount: encyclopedias?.length ?? 0,
+                                                                                  itemCount: encyclopedias?.keys.length ?? 0,
                                                                                   itemBuilder: (BuildContext context, int index) {
-                                                                                    final character = encyclopedias?[index];
+                                                                                    final character = encyclopedias?.keys?.toList()[index];
                                                                                     return Padding(
                                                                                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                                                                                       child: InkWell(
@@ -1142,30 +1143,33 @@ class _HomePageState extends State<HomePage> {
                                                                             mainAxisAlignment:
                                                                                 MainAxisAlignment.start,
                                                                             children: [
-                                                                              SvgPicture.asset('assets/images/VectorLine.svg'),
-                                                                              const SizedBox(width: 12),
                                                                               Expanded(
-                                                                                child: GestureDetector(
-                                                                                  onTap: () {
-                                                                                    Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
-                                                                                      builder: (_) => BookReadScreen(
-                                                                                        encyclopediaBody: !encyData.isEmpty ? encyData.first : e?.first,
-                                                                                      ),
-                                                                                    ));
-                                                                                  },
-                                                                                  child: SizedBox(
+                                                                                child:  SizedBox(
                                                                                     width: MediaQuery.of(context).size.width / 2,
-                                                                                    child: Text(
-                                                                                      '${!encyData.isEmpty ? encyData.first.title : e?.first.title}',
-                                                                                      textAlign: TextAlign.start,
-                                                                                      style: const TextStyle(
-                                                                                        fontFamily: 'GHEAGrapalat',
-                                                                                        fontSize: 12,
-                                                                                        fontWeight: FontWeight.w700,
-                                                                                        letterSpacing: 1,
-                                                                                        color: Color.fromRGBO(113, 141, 156, 1),
-                                                                                      ),
-                                                                                    ),
+                                                                                    child: ListView.builder(
+                                                                                      shrinkWrap: true,
+                                                                                      itemCount: encyclopedias![charTitle]?.length ?? 0,
+                                                                                      itemBuilder: (context, index) {
+                                                                                        var item = encyclopedias![charTitle][index];
+
+                                                                                        return GestureDetector(child: Text(item["title"],textAlign: TextAlign.start,
+                                                                                            style: const TextStyle(
+                                                                                              fontFamily: 'GHEAGrapalat',
+                                                                                              fontSize: 12,
+                                                                                              fontWeight: FontWeight.w700,
+                                                                                              letterSpacing: 1,
+                                                                                              color: Color.fromRGBO(113, 141, 156, 1),)),
+                                                                                            onTap: () {
+                                                                                              var filterItem = encyData.isEmpty ? e?.first :
+                                                                                              encyData.where((element) => element.id == item['id']).toList().first;
+                                                                                              Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
+                                                                                                builder: (_) => BookReadScreen(
+                                                                                                  encyclopediaBody:  filterItem,
+                                                                                                ),
+                                                                                              ));
+                                                                                            },
+                                                                                            );
+                                                                                      },
                                                                                   ),
                                                                                 ),
                                                                               ),
@@ -1231,11 +1235,13 @@ class _HomePageState extends State<HomePage> {
                                                                                   alignment: Alignment.centerRight,
                                                                                   child: ListView.separated(
                                                                                     separatorBuilder: (context, index) => const SizedBox(width: 10.0),
-                                                                                    itemCount: encyclopedias!.length,
+                                                                                    itemCount: encyclopedias!.entries.map((e) => e.key).toList()!.length,
                                                                                     shrinkWrap: true,
                                                                                     scrollDirection: Axis.horizontal,
                                                                                     physics: const NeverScrollableScrollPhysics(),
                                                                                     itemBuilder: (context, index) {
+
+
                                                                                       return Container(
                                                                                         height: 34,
                                                                                         width: 45,
@@ -1253,15 +1259,17 @@ class _HomePageState extends State<HomePage> {
                                                                                         child: Center(
                                                                                           child: InkWell(
                                                                                             onTap: () async {
-                                                                                              print(encyclopedias?[index]);
-                                                                                              charTitle = encyclopedias![index];
-                                                                                              await _bookDataProvider.getDataByCharacters(Api.encyclopediasByCharacters(encyclopedias?[index])).then((value) {
+                                                                                              setState(() {
+                                                                                               charTitle = encyclopedias!.keys.toList()[index];
+                                                                                              });
+
+                                                                                              await _bookDataProvider.getDataByCharacters(Api.encyclopediasByCharacters(charTitle)).then((value) {
                                                                                                 setState(() {
                                                                                                   encyData = value;
                                                                                                 });
                                                                                               });
                                                                                             },
-                                                                                            child: Text(' ${encyclopedias?[index]}'),
+                                                                                            child: Text(' ${encyclopedias!.keys.toList()[index]}'),
                                                                                           ),
                                                                                         ),
                                                                                       );
@@ -1308,7 +1316,7 @@ class _HomePageState extends State<HomePage> {
                                                                                       width: double.infinity,
                                                                                       height: double.infinity,
                                                                                       child: Text(
-                                                                                        '${!charTitle.isEmpty ? charTitle : encyclopedias?.first}',
+                                                                                        '${!charTitle.isEmpty ? charTitle : encyclopedias?.keys.first}',
                                                                                         style: const TextStyle(
                                                                                           color: Palette.whenTapedButton,
                                                                                           fontFamily: 'ArshaluyseArtU',

@@ -12,16 +12,22 @@ class HomeData {
 
   Content? libraries;
   List<Lessons>? lessons;
-  List<String>? encyclopedias;
+  Map<String, dynamic>? encyclopedias; // Updated to use a Map
   String? audiolibraries;
   List<String>? dialects;
 
-  factory HomeData.fromJson(Map<dynamic, dynamic> json) => HomeData(
-        libraries: Content.fromJson(json["libraries"]),
-        lessons:
-            List<Lessons>.from(json["lessons"].map((x) => Lessons.fromJson(x))),
-        encyclopedias: List<String>.from(json["encyclopedias"].map((x) => x)),
-        audiolibraries: json["audiolibraries"],
-        dialects: List<String>.from(json["dialects"].map((x) => x)),
-      );
+  factory HomeData.fromJson(Map<dynamic, dynamic> json) {
+    return HomeData(
+      libraries: Content.fromJson(json["libraries"]),
+      lessons: List<Lessons>.from(json["lessons"].map((x) => Lessons.fromJson(x))),
+      encyclopedias: Map<String, dynamic>.from(json["encyclopedias"]),
+      audiolibraries: json["audiolibraries"],
+      dialects: List<String>.from(json["dialects"].map((x) => x)),
+    );
+  }
+
+  // Get value from encyclopedias using a key
+  String? getEncyclopediaValue(String key) {
+    return encyclopedias?[key];
+  }
 }
