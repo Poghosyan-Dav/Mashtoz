@@ -258,7 +258,7 @@ class _ContactState extends State<Contact> {
         width: double.infinity,
         child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              primary: const Color.fromRGBO(113, 141, 156, 1),
+              backgroundColor: const Color.fromRGBO(113, 141, 156, 1),
               shape:
                   const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
             ),

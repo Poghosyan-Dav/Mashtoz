@@ -329,8 +329,7 @@ class _ForgotButton extends StatelessWidget {
             fontWeight: FontWeight.w400),
       ),
       style: TextButton.styleFrom(
-        primary: Colors.amber,
-        padding: const EdgeInsets.only(right: 40),
+        foregroundColor: Colors.amber, padding: const EdgeInsets.only(right: 40),
       ),
     );
   }
